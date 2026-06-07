@@ -37,7 +37,8 @@ export const TRANSLATIONS = {
         notes: {
             C: "Dó", D: "Ré", E: "Mi", F: "Fá", G: "Sol", A: "Lá", B: "Si",
             minor: "menor"
-        }
+        },
+        back: "Voltar"
     },
     en: {
         gameTitle: "Gems Symphony",
@@ -59,7 +60,8 @@ export const TRANSLATIONS = {
         notes: {
             C: "C", D: "D", E: "E", F: "F", G: "G", A: "A", B: "B",
             minor: "minor"
-        }
+        },
+        back: "Back"
     }
 };
 
