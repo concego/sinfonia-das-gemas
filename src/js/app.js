@@ -4,7 +4,7 @@ import { renderizarTabuleiro, atualizarStatus } from './ui.js';
 
 let state = {
     modo: MODOS.PADRAO,
-    lang: navigator.language.startsWith('pt') ? 'pt' : 'en',
+    lang: localStorage.getItem('game_lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en'),
     tabuleiro: [],
     pontos: 0,
     vidas: 3,
@@ -12,13 +12,40 @@ let state = {
     selecionada: null
 };
 
-const T = TRANSLATIONS[state.lang];
+let T = TRANSLATIONS[state.lang];
+
+function mudarIdioma(lang) {
+    state.lang = lang;
+    localStorage.setItem('game_lang', lang);
+    T = TRANSLATIONS[lang];
+    
+    // Atualiza botões e textos
+    document.getElementById('titulo-jogo').textContent = T.gameTitle;
+    document.getElementById('btn-iniciar').textContent = T.play;
+    document.getElementById('btn-voltar').textContent = T.back;
+
+    // Atualiza as labels de status
+    atualizarStatus(state.pontos, state.vidas, null, T);
+    
+    // Atualiza destaque visual dos botões de idioma
+    document.getElementById('btn-pt').classList.toggle('active', lang === 'pt');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+
+    if (!document.getElementById('tela-jogo').classList.contains('hidden')) {
+        atualizarUI();
+    }
+}
 
 function init() {
     document.getElementById('btn-iniciar').onclick = iniciarJogo;
+    document.getElementById('btn-voltar').onclick = voltarMenu;
+    document.getElementById('btn-pt').onclick = () => mudarIdioma('pt');
+    document.getElementById('btn-en').onclick = () => mudarIdioma('en');
+    
     window.gerenciarClique = gerenciarClique;
-    // Traduz interface inicial
-    document.getElementById('titulo-jogo').textContent = T.gameTitle;
+    
+    // Aplica idioma inicial
+    mudarIdioma(state.lang);
 }
 
 function iniciarJogo() {
@@ -29,6 +56,11 @@ function iniciarJogo() {
     document.getElementById('tela-menu').classList.add('hidden');
     document.getElementById('tela-jogo').classList.remove('hidden');
     gerarTabuleiro(5); // Padrão 5x5
+}
+
+function voltarMenu() {
+    document.getElementById('tela-jogo').classList.add('hidden');
+    document.getElementById('tela-menu').classList.remove('hidden');
 }
 
 function gerarTabuleiro(tam) {
