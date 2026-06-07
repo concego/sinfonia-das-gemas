@@ -18,10 +18,17 @@
         .gema-opaca { opacity: 0.5; }
         .selecionada { outline: 4px solid #00ffcc; z-index: 10; }
         .btn-acao { background: #bb86fc; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin: 5px; }
+        .btn-lang { background: transparent; border: 1px solid #bb86fc; color: #bb86fc; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .btn-lang.active { background: #bb86fc; color: #000; }
     </style>
 </head>
 <body>
     <div id="app-container">
+        <!-- Seletor de Idioma -->
+        <div id="container-idioma" style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;">
+            <button class="btn-lang" id="btn-pt">🇧🇷 PT</button>
+            <button class="btn-lang" id="btn-en">🇺🇸 EN</button>
+        </div>
         <!-- Tela de Menu -->
         <div id="tela-menu">
             <h1 id="titulo-jogo">Sinfonia das Gemas</h1>
@@ -29,15 +36,16 @@
             <div id="menu-opcoes">
                 <!-- Injetado via JS -->
             </div>
-            <button id="btn-iniciar" class="btn-acao">JOGAR / PLAY</button>
+            <button id="btn-iniciar" class="btn-acao"></button>
             <button id="btn-pass" class="btn-acao">PASSWORD</button>
         </div>
 
         <!-- Tela de Jogo -->
         <div id="tela-jogo" class="hidden">
             <div id="painel-status">
-                <span id="label-score">Pontos: 0</span> | 
-                <span id="label-vidas">Vidas: 3</span>
+                <span id="label-score"></span> | 
+                <span id="label-vidas"></span> |
+                <span id="label-meta"></span>
             </div>
             <div id="container-tabuleiro">
                 <!-- Tabela gerada via JS -->
