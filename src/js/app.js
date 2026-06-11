@@ -47,16 +47,42 @@ function init() {
     const elBtnVoltar = document.getElementById('btn-voltar');
     const elBtnPt = document.getElementById('btn-pt');
     const elBtnEn = document.getElementById('btn-en');
+    const elBtnLoadPass = document.getElementById('btn-load-pass');
 
     if (elBtnIniciar) elBtnIniciar.onclick = iniciarJogo;
     if (elBtnVoltar) elBtnVoltar.onclick = voltarMenu;
     if (elBtnPt) elBtnPt.onclick = () => mudarIdioma('pt');
     if (elBtnEn) elBtnEn.onclick = () => mudarIdioma('en');
+    if (elBtnLoadPass) elBtnLoadPass.onclick = carregarRetroPassword;
     
     window.gerenciarClique = gerenciarClique;
     
     // Aplica idioma inicial
     mudarIdioma(state.lang);
+}
+
+function gerarRetroPassword() {
+    // Sistema simples: M (modo) N (nível) P (pontos)
+    const p = btoa(`${state.modo}|${state.nivel}|${state.pontos}`).replace(/=/g, '');
+    const display = document.getElementById('current-pass-display');
+    if (display) display.textContent = `Sua senha: ${p}`;
+    return p;
+}
+
+function carregarRetroPassword() {
+    const pass = document.getElementById('input-pass').value.trim();
+    if (!pass) return;
+    try {
+        const decoded = atob(pass);
+        const [m, n, pts] = decoded.split('|');
+        state.modo = m;
+        state.nivel = parseInt(n);
+        state.pontos = parseInt(pts);
+        alert(`Progresso carregado: Nível ${n}, ${pts} pontos.`);
+        iniciarJogo();
+    } catch (e) {
+        alert("Senha inválida.");
+    }
 }
 
 function iniciarJogo() {
@@ -176,6 +202,9 @@ function verificarMatches() {
 function processarMatch(coordsSet) {
     state.pontos += coordsSet.size * 10;
     tocarAcorde([440, 554, 659]); // Som de sucesso
+    
+    // Gera senha atualizada
+    gerarRetroPassword();
 
     coordsSet.forEach(coord => {
         const [l, c] = coord.split(',').map(Number);
