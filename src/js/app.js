@@ -20,16 +20,22 @@ function mudarIdioma(lang) {
     T = TRANSLATIONS[lang];
     
     // Atualiza botões e textos
-    document.getElementById('titulo-jogo').textContent = T.gameTitle;
-    document.getElementById('btn-iniciar').textContent = T.play;
-    document.getElementById('btn-voltar').textContent = T.back;
+    const elTitulo = document.getElementById('titulo-jogo');
+    const elBtnIniciar = document.getElementById('btn-iniciar');
+    const elBtnVoltar = document.getElementById('btn-voltar');
+
+    if (elTitulo) elTitulo.textContent = T.gameTitle;
+    if (elBtnIniciar) elBtnIniciar.textContent = T.play;
+    if (elBtnVoltar) elBtnVoltar.textContent = T.back;
 
     // Atualiza as labels de status
     atualizarStatus(state.pontos, state.vidas, null, T);
     
     // Atualiza destaque visual dos botões de idioma
-    document.getElementById('btn-pt').classList.toggle('active', lang === 'pt');
-    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    const btnPt = document.getElementById('btn-pt');
+    const btnEn = document.getElementById('btn-en');
+    if (btnPt) btnPt.classList.toggle('active', lang === 'pt');
+    if (btnEn) btnEn.classList.toggle('active', lang === 'en');
 
     if (!document.getElementById('tela-jogo').classList.contains('hidden')) {
         atualizarUI();
@@ -37,10 +43,15 @@ function mudarIdioma(lang) {
 }
 
 function init() {
-    document.getElementById('btn-iniciar').onclick = iniciarJogo;
-    document.getElementById('btn-voltar').onclick = voltarMenu;
-    document.getElementById('btn-pt').onclick = () => mudarIdioma('pt');
-    document.getElementById('btn-en').onclick = () => mudarIdioma('en');
+    const elBtnIniciar = document.getElementById('btn-iniciar');
+    const elBtnVoltar = document.getElementById('btn-voltar');
+    const elBtnPt = document.getElementById('btn-pt');
+    const elBtnEn = document.getElementById('btn-en');
+
+    if (elBtnIniciar) elBtnIniciar.onclick = iniciarJogo;
+    if (elBtnVoltar) elBtnVoltar.onclick = voltarMenu;
+    if (elBtnPt) elBtnPt.onclick = () => mudarIdioma('pt');
+    if (elBtnEn) elBtnEn.onclick = () => mudarIdioma('en');
     
     window.gerenciarClique = gerenciarClique;
     
@@ -105,10 +116,7 @@ function trocarGemas(l1, c1, l2, c2) {
     const t = state.tabuleiro[l1][c1];
     state.tabuleiro[l1][c1] = state.tabuleiro[l2][c2];
     state.tabuleiro[l2][c2] = t;
-
-    // Aqui entraria a lógica de checar matches e ativar power-ups
-    // Exemplo simplificado de detecção de match-3
-    console.log("Troca realizada. Checando harmonia...");
+    console.log("Troca realizada.");
 }
 
 window.onload = init;
