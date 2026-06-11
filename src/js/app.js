@@ -113,10 +113,81 @@ function gerenciarClique(l, c) {
 }
 
 function trocarGemas(l1, c1, l2, c2) {
-    const t = state.tabuleiro[l1][c1];
-    state.tabuleiro[l1][c1] = state.tabuleiro[l2][c2];
-    state.tabuleiro[l2][c2] = t;
-    console.log("Troca realizada.");
+    const g1 = state.tabuleiro[l1][c1];
+    const g2 = state.tabuleiro[l2][c2];
+
+    state.tabuleiro[l1][c1] = g2;
+    state.tabuleiro[l2][c2] = g1;
+
+    if (!verificarMatches()) {
+        // Se não houver match, desfaz a troca após um pequeno delay
+        setTimeout(() => {
+            state.tabuleiro[l1][c1] = g1;
+            state.tabuleiro[l2][c2] = g2;
+            atualizarUI();
+        }, 300);
+    }
+}
+
+function verificarMatches() {
+    let houveMatch = false;
+    const tam = state.tabuleiro.length;
+    const paraRemover = new Set();
+
+    // Horizontal
+    for (let i = 0; i < tam; i++) {
+        for (let j = 0; j < tam - 2; j++) {
+            const n1 = state.tabuleiro[i][j].nota;
+            const n2 = state.tabuleiro[i][j+1].nota;
+            const n3 = state.tabuleiro[i][j+2].nota;
+            if (n1 === n2 && n2 === n3) {
+                paraRemover.add(`${i},${j}`);
+                paraRemover.add(`${i},${j+1}`);
+                paraRemover.add(`${i},${j+2}`);
+                houveMatch = true;
+            }
+        }
+    }
+
+    // Vertical
+    for (let j = 0; j < tam; j++) {
+        for (let i = 0; i < tam - 2; i++) {
+            const n1 = state.tabuleiro[i][j].nota;
+            const n2 = state.tabuleiro[i+1][j].nota;
+            const n3 = state.tabuleiro[i+2][j].nota;
+            if (n1 === n2 && n2 === n3) {
+                paraRemover.add(`${i},${j}`);
+                paraRemover.add(`${i+1},${j}`);
+                paraRemover.add(`${i+2},${j}`);
+                houveMatch = true;
+            }
+        }
+    }
+
+    if (houveMatch) {
+        processarMatch(paraRemover);
+    }
+    return houveMatch;
+}
+
+function processarMatch(coordsSet) {
+    state.pontos += coordsSet.size * 10;
+    tocarAcorde([440, 554, 659]); // Som de sucesso
+
+    coordsSet.forEach(coord => {
+        const [l, c] = coord.split(',').map(Number);
+        const notas = Object.keys(NOTAS_INFO);
+        state.tabuleiro[l][c] = {
+            nota: notas[Math.floor(Math.random() * notas.length)],
+            isMinor: Math.random() > 0.8,
+            powerUp: null,
+            selecionada: false
+        };
+    });
+
+    atualizarUI();
+    // Checa cascata
+    setTimeout(verificarMatches, 500);
 }
 
 window.onload = init;
