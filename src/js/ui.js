@@ -48,9 +48,13 @@ export function renderizarTabuleiro(matriz, notasInfo, translations, callbackCli
 }
 
 export function atualizarStatus(pontos, vidas, meta, translations) {
-    document.getElementById('label-score').textContent = `${translations.score}: ${pontos}`;
-    document.getElementById('label-vidas').textContent = `${translations.lives}: ${vidas}`;
-    if (meta) {
-        document.getElementById('label-meta').textContent = `${translations.goal}: ${meta}`;
+    const elScore = document.getElementById('label-score');
+    const elVidas = document.getElementById('label-vidas');
+    const elMeta = document.getElementById('label-meta');
+
+    if (elScore) elScore.textContent = `${translations.score}: ${pontos}`;
+    if (elVidas) elVidas.textContent = `${translations.lives}: ${vidas}`;
+    if (elMeta) {
+        elMeta.textContent = meta ? `${translations.goal}: ${meta}` : '';
     }
 }
