@@ -31,8 +31,29 @@
         <div id="tela-menu">
             <h1 id="titulo-jogo">Sinfonia das Gemas</h1>
             <p id="subtitulo-jogo">Eu Concego Jogar 🐉</p>
+            
+            <div id="credits" style="font-size: 0.9em; margin-bottom: 20px; color: #aaa;">
+                <p>UX Inclusiva & Design de Modos: <strong>Adriele (Adri Lima)</strong></p>
+            </div>
+
+            <div id="modo-selector" style="margin-bottom: 20px;">
+                <select id="select-modo" class="btn-lang" style="width: 200px;">
+                    <option value="PADRAO">Padrão</option>
+                    <option value="MAESTRO">Modo Maestro</option>
+                    <option value="COMPOSITOR">Modo Compositor</option>
+                    <option value="SUDOKU">Sudoku Musical</option>
+                    <option value="ZEN">Modo Zen</option>
+                </select>
+            </div>
+
             <button id="btn-iniciar" class="btn-acao"></button>
-            <button id="btn-pass" class="btn-acao">PASSWORD</button>
+            
+            <div style="margin-top: 20px;">
+                <input type="text" id="input-pass" placeholder="Retro Password" class="btn-lang" style="text-transform: uppercase;">
+                <button id="btn-load-pass" class="btn-acao" style="padding: 8px 15px; font-size: 0.9em;">Carregar</button>
+            </div>
+            
+            <p id="current-pass-display" style="margin-top: 10px; font-family: monospace; color: #bb86fc;"></p>
         </div>
         <div id="tela-jogo" class="hidden">
             <div id="painel-status">
