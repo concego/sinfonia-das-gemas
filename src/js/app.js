@@ -120,13 +120,16 @@ function trocarGemas(l1, c1, l2, c2) {
     state.tabuleiro[l2][c2] = g1;
 
     if (!verificarMatches()) {
-        // Se não houver match, desfaz a troca após um pequeno delay
-        setTimeout(() => {
-            state.tabuleiro[l1][c1] = g1;
-            state.tabuleiro[l2][c2] = g2;
-            atualizarUI();
-        }, 300);
+        // Regra do Anderson: Se não houver match, a peça FICA, mas perde vida
+        state.vidas--;
+        if (state.vidas <= 0) {
+            alert(T.gameOver);
+            iniciarJogo(); // Reinicia por enquanto
+            return;
+        }
+        tocarPowerUp('METRONOMO'); // Som de erro/impacto
     }
+    atualizarUI();
 }
 
 function verificarMatches() {
