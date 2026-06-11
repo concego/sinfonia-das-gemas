@@ -1,62 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinfonia das Gemas | Gems Symphony</title>
     <link rel="manifest" href="manifest.json">
-    <title>Gold Rush: The Debtor's Escape</title>
+    <meta name="theme-color" content="#bb86fc">
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #121212; color: #fff; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        #app-container { width: 100%; max-width: 500px; padding: 20px; text-align: center; }
+        .hidden { display: none; }
+        table { border-collapse: collapse; margin: 20px auto; background: #1e1e1e; border: 2px solid #333; }
+        td { width: 60px; height: 60px; border: 1px solid #333; cursor: pointer; position: relative; }
+        .cristal { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 4px; }
+        .gema-opaca { opacity: 0.5; }
+        .selecionada { outline: 4px solid #00ffcc; z-index: 10; }
+        .btn-acao { background: #bb86fc; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin: 5px; }
+        .btn-lang { background: transparent; border: 1px solid #bb86fc; color: #bb86fc; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .btn-lang.active { background: #bb86fc; color: #000; }
+        #painel-status { margin-bottom: 10px; font-size: 1.2em; }
+    </style>
 </head>
 <body>
-    <div id="game-container">
-        <!-- Status Bar -->
-        <header id="status-bar" role="status">
-            <div class="stat">Gold: <span id="gold-val">1500</span></div>
-            <div class="stat">HP: <span id="hp-val">18/18</span></div>
-            <div class="stat">Debt: <span id="debt-val">5000</span></div>
-            <div class="stat" id="facing-display">Facing: North</div>
-        </header>
-
-        <main id="ui-layout">
-            <!-- Left Panel: Movement & Navigation -->
-            <section id="movement-panel" aria-label="Movement Controls">
-                <div class="control-group">
-                    <button id="btn-up" aria-label="Move Forward">Forward</button>
-                    <div class="rotation-controls">
-                        <button id="btn-left" aria-label="Turn Left">Turn Left</button>
-                        <button id="btn-right" aria-label="Turn Right">Turn Right</button>
-                    </div>
-                    <button id="btn-down" aria-label="Step Back">Back</button>
-                </div>
-                <button id="btn-scan" class="utility-btn" aria-label="Auto-Scan Surroundings">Scan</button>
-            </section>
-
-            <!-- Center: Visual Viewport (Placeholder) -->
-            <section id="viewport" aria-hidden="true">
-                <canvas id="game-canvas"></canvas>
-                <div id="visual-overlay"></div>
-            </section>
-
-            <!-- Right Panel: Actions -->
-            <section id="action-panel" aria-label="Action Controls">
-                <button id="btn-attack" class="action-btn" aria-label="Attack">Attack</button>
-                <button id="btn-interact" class="action-btn" aria-label="Interact">Interact</button>
-                <button id="btn-inventory" class="utility-btn" aria-label="Inventory">Inventory</button>
-            </section>
-        </main>
-
-        <!-- ARIA Live Log -->
-        <div id="game-log" role="log" aria-live="polite" aria-relevant="additions">
-            Welcome to the depths, Rogue. Escaping is the only way to pay your debt.
+    <div id="app-container">
+        <div id="container-idioma" style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;">
+            <button class="btn-lang" id="btn-pt">🇧🇷 PT</button>
+            <button class="btn-lang" id="btn-en">🇺🇸 EN</button>
+        </div>
+        <div id="tela-menu">
+            <h1 id="titulo-jogo">Sinfonia das Gemas</h1>
+            <p id="subtitulo-jogo">Eu Concego Jogar 🐉</p>
+            <button id="btn-iniciar" class="btn-acao"></button>
+            <button id="btn-pass" class="btn-acao">PASSWORD</button>
+        </div>
+        <div id="tela-jogo" class="hidden">
+            <div id="painel-status">
+                <span id="label-score"></span> | 
+                <span id="label-vidas"></span> |
+                <span id="label-meta"></span>
+            </div>
+            <div id="container-tabuleiro"></div>
+            <button id="btn-voltar" class="btn-acao"></button>
         </div>
     </div>
-
-    <script src="gold-rush-core.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-    </script>
+    <script type="module" src="src/js/app.js"></script>
 </body>
 </html>
