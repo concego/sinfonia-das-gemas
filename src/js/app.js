@@ -1,6 +1,7 @@
 import { MODOS, NOTAS_INFO, TRANSLATIONS, POWER_UPS } from './config.js';
 import { initAudio, tocarGema, tocarPowerUp, tocarAcorde } from './audio.js';
 import { renderizarTabuleiro, atualizarStatus } from './ui.js';
+import { gerarPassword, validarPassword } from './passwords.js';
 
 let state = {
     modo: MODOS.PADRAO,
@@ -9,10 +10,19 @@ let state = {
     pontos: 0,
     vidas: 3,
     nivel: 1,
-    selecionada: null
+    selecionada: null,
+    objetivoCompositor: null
 };
 
 let T = TRANSLATIONS[state.lang];
+
+function anunciar(texto) {
+    const el = document.getElementById('announcer');
+    if (el) {
+        el.textContent = '';
+        setTimeout(() => { el.textContent = texto; }, 50);
+    }
+}
 
 function mudarIdioma(lang) {
     state.lang = lang;
@@ -48,6 +58,7 @@ function init() {
     const elBtnPt = document.getElementById('btn-pt');
     const elBtnEn = document.getElementById('btn-en');
     const elBtnLoadPass = document.getElementById('btn-load-pass');
+    const elSelectModo = document.getElementById('select-modo');
 
     if (elBtnIniciar) elBtnIniciar.onclick = iniciarJogo;
     if (elBtnVoltar) elBtnVoltar.onclick = voltarMenu;
@@ -55,34 +66,16 @@ function init() {
     if (elBtnEn) elBtnEn.onclick = () => mudarIdioma('en');
     if (elBtnLoadPass) elBtnLoadPass.onclick = carregarRetroPassword;
     
+    if (elSelectModo) {
+        elSelectModo.onchange = (e) => {
+            state.modo = e.target.value;
+        };
+    }
+    
     window.gerenciarClique = gerenciarClique;
     
     // Aplica idioma inicial
     mudarIdioma(state.lang);
-}
-
-function gerarRetroPassword() {
-    // Sistema simples: M (modo) N (nível) P (pontos)
-    const p = btoa(`${state.modo}|${state.nivel}|${state.pontos}`).replace(/=/g, '');
-    const display = document.getElementById('current-pass-display');
-    if (display) display.textContent = `Sua senha: ${p}`;
-    return p;
-}
-
-function carregarRetroPassword() {
-    const pass = document.getElementById('input-pass').value.trim();
-    if (!pass) return;
-    try {
-        const decoded = atob(pass);
-        const [m, n, pts] = decoded.split('|');
-        state.modo = m;
-        state.nivel = parseInt(n);
-        state.pontos = parseInt(pts);
-        alert(`Progresso carregado: Nível ${n}, ${pts} pontos.`);
-        iniciarJogo();
-    } catch (e) {
-        alert("Senha inválida.");
-    }
 }
 
 function iniciarJogo() {
@@ -90,9 +83,19 @@ function iniciarJogo() {
     state.pontos = 0;
     state.vidas = 3;
     state.nivel = 1;
+    
+    if (state.modo === MODOS.COMPOSITOR) {
+        state.objetivoCompositor = ['C', 'E', 'G']; // Acorde de Dó Maior
+    } else {
+        state.objetivoCompositor = null;
+    }
+
     document.getElementById('tela-menu').classList.add('hidden');
     document.getElementById('tela-jogo').classList.remove('hidden');
-    gerarTabuleiro(5); // Padrão 5x5
+    
+    const tam = (state.modo === MODOS.SUDOKU) ? 3 : 5;
+    gerarTabuleiro(tam);
+    anunciar(`${T.gameTitle} iniciado no modo ${state.modo}. Tabuleiro ${tam} por ${tam}.`);
 }
 
 function voltarMenu() {
@@ -115,11 +118,20 @@ function gerarTabuleiro(tam) {
 
 function atualizarUI() {
     renderizarTabuleiro(state.tabuleiro, NOTAS_INFO, T, gerenciarClique);
-    atualizarStatus(state.pontos, state.vidas, 500, T);
+    
+    let metaTexto = "500";
+    if (state.modo === MODOS.COMPOSITOR && state.objetivoCompositor) {
+        metaTexto = `${T.nextChord} ${state.objetivoCompositor.join('-')}`;
+    }
+    
+    atualizarStatus(state.pontos, state.vidas, metaTexto, T);
 }
 
 function gerenciarClique(l, c) {
     const gema = state.tabuleiro[l][c];
+    const nomeNota = T.notes[gema.nota] + (gema.isMinor ? ` ${T.notes.minor}` : '');
+    anunciar(`${nomeNota} em linha ${l+1} coluna ${c+1}`);
+    
     tocarGema(NOTAS_INFO[gema.nota].freq, gema.isMinor);
 
     if (!state.selecionada) {
@@ -132,6 +144,8 @@ function gerenciarClique(l, c) {
         const dist = Math.abs(l - l1) + Math.abs(c - c1);
         if (dist === 1) {
             trocarGemas(l1, c1, l, c);
+        } else {
+            anunciar("Seleção cancelada");
         }
         state.selecionada = null;
     }
@@ -145,21 +159,25 @@ function trocarGemas(l1, c1, l2, c2) {
     state.tabuleiro[l1][c1] = g2;
     state.tabuleiro[l2][c2] = g1;
 
-    if (!verificarMatches()) {
-        // Regra do Anderson: Se não houver match, a peça FICA, mas perde vida
+    const matches = verificarMatches();
+    
+    if (matches.length === 0) {
         state.vidas--;
+        anunciar(`Nenhuma harmonia formada. Perdeu uma vida. Restam ${state.vidas}.`);
         if (state.vidas <= 0) {
+            anunciar(T.gameOver);
             alert(T.gameOver);
-            iniciarJogo(); // Reinicia por enquanto
+            iniciarJogo();
             return;
         }
-        tocarPowerUp('METRONOMO'); // Som de erro/impacto
+        tocarPowerUp('METRONOMO');
+    } else {
+        processarMatch(matches);
     }
     atualizarUI();
 }
 
 function verificarMatches() {
-    let houveMatch = false;
     const tam = state.tabuleiro.length;
     const paraRemover = new Set();
 
@@ -169,11 +187,22 @@ function verificarMatches() {
             const n1 = state.tabuleiro[i][j].nota;
             const n2 = state.tabuleiro[i][j+1].nota;
             const n3 = state.tabuleiro[i][j+2].nota;
+            
             if (n1 === n2 && n2 === n3) {
                 paraRemover.add(`${i},${j}`);
                 paraRemover.add(`${i},${j+1}`);
                 paraRemover.add(`${i},${j+2}`);
-                houveMatch = true;
+            }
+            
+            if (state.modo === MODOS.COMPOSITOR && state.objetivoCompositor) {
+                const notasMatch = [n1, n2, n3].sort();
+                const objMatch = [...state.objetivoCompositor].sort();
+                if (JSON.stringify(notasMatch) === JSON.stringify(objMatch)) {
+                    paraRemover.add(`${i},${j}`);
+                    paraRemover.add(`${i},${j+1}`);
+                    paraRemover.add(`${i},${j+2}`);
+                    anunciar("Acorde harmonizado!");
+                }
             }
         }
     }
@@ -188,25 +217,21 @@ function verificarMatches() {
                 paraRemover.add(`${i},${j}`);
                 paraRemover.add(`${i+1},${j}`);
                 paraRemover.add(`${i+2},${j}`);
-                houveMatch = true;
             }
         }
     }
 
-    if (houveMatch) {
-        processarMatch(paraRemover);
-    }
-    return houveMatch;
+    return Array.from(paraRemover);
 }
 
-function processarMatch(coordsSet) {
-    state.pontos += coordsSet.size * 10;
-    tocarAcorde([440, 554, 659]); // Som de sucesso
+function processarMatch(coordsArray) {
+    const pontosGanhos = coordsArray.length * 10;
+    state.pontos += pontosGanhos;
+    anunciar(`Harmonia realizada! Ganhou ${pontosGanhos} pontos. Total: ${state.pontos}`);
     
-    // Gera senha atualizada
-    gerarRetroPassword();
+    tocarAcorde([440, 554, 659]);
 
-    coordsSet.forEach(coord => {
+    coordsArray.forEach(coord => {
         const [l, c] = coord.split(',').map(Number);
         const notas = Object.keys(NOTAS_INFO);
         state.tabuleiro[l][c] = {
@@ -217,9 +242,32 @@ function processarMatch(coordsSet) {
         };
     });
 
+    const pass = gerarPassword(state.nivel, state.vidas);
+    const display = document.getElementById('current-pass-display');
+    if (display) display.textContent = `Sua senha: ${pass}`;
+
     atualizarUI();
-    // Checa cascata
-    setTimeout(verificarMatches, 500);
+    
+    setTimeout(() => {
+        const novosMatches = verificarMatches();
+        if (novosMatches.length > 0) processarMatch(novosMatches);
+    }, 500);
+}
+
+function carregarRetroPassword() {
+    const pass = document.getElementById('input-pass').value.trim();
+    if (!pass) return;
+    const dados = validarPassword(pass);
+    if (dados) {
+        state.nivel = dados.nivel;
+        state.vidas = dados.vidas;
+        anunciar(`Progresso carregado. Nível ${state.nivel}, Vidas ${state.vidas}.`);
+        alert(`Progresso carregado!`);
+        iniciarJogo();
+    } else {
+        anunciar("Senha inválida.");
+        alert("Senha inválida.");
+    }
 }
 
 window.onload = init;
