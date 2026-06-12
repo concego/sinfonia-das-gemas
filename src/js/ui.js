@@ -1,6 +1,3 @@
-/**
- * Sinfonia das Gemas / Gems Symphony - UI Engine
- */
 export function renderizarTabuleiro(matriz, notasInfo, translations, callbackClique) {
     const container = document.getElementById('container-tabuleiro');
     const tabela = document.createElement('table');
@@ -36,6 +33,14 @@ export function renderizarTabuleiro(matriz, notasInfo, translations, callbackCli
             td.onclick = (e) => {
                 e.preventDefault();
                 callbackClique(i, j);
+            };
+            
+            // Adicionado suporte a teclado (Enter/Espaço)
+            td.onkeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    callbackClique(i, j);
+                }
             };
             
             tr.appendChild(td);
