@@ -270,4 +270,9 @@ function carregarRetroPassword() {
     }
 }
 
-window.onload = init;
+// Chamar init explicitamente e expor para o escopo global se necessário
+init();
+window.mudarIdioma = mudarIdioma;
+window.iniciarJogo = iniciarJogo;
+window.voltarMenu = voltarMenu;
+window.carregarRetroPassword = carregarRetroPassword;
