@@ -1,65 +1,22 @@
-export function renderizarTabuleiro(matriz, notasInfo, translations, callbackClique) {
-    const container = document.getElementById('container-tabuleiro');
-    const tabela = document.createElement('table');
-    tabela.setAttribute('role', 'grid');
-    tabela.setAttribute('aria-label', translations.gameTitle);
-
-    matriz.forEach((linha, i) => {
-        const tr = document.createElement('tr');
-        linha.forEach((gema, j) => {
-            const td = document.createElement('td');
-            const info = notasInfo[gema.nota];
-            
-            // Texto para o leitor de tela
-            let nomeNota = translations.notes[gema.nota];
-            if (gema.isMinor) nomeNota += ` ${translations.notes.minor}`;
-            if (gema.powerUp) nomeNota += ` - ${translations.powerUps[gema.powerUp]}`;
-
-            td.setAttribute('role', 'gridcell');
-            td.setAttribute('aria-label', `L${i+1}C${j+1}: ${nomeNota}`);
-            td.setAttribute('tabindex', '0');
-            
-            if (gema.isMinor) td.classList.add('gema-opaca');
-            if (gema.selecionada) td.classList.add('selecionada');
-
-            // Representação visual
-            td.innerHTML = `
-                <div class="cristal" style="background-color: ${info.cor}">
-                    <span class="simbolo">${gema.nota}${gema.isMinor ? 'm' : ''}</span>
-                    ${gema.powerUp ? `<span class="icon-power">${gema.powerUp[0]}</span>` : ''}
-                </div>
-            `;
-
-            td.onclick = (e) => {
-                e.preventDefault();
-                callbackClique(i, j);
-            };
-            
-            // Adicionado suporte a teclado (Enter/Espaço)
-            td.onkeydown = (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    callbackClique(i, j);
-                }
-            };
-            
-            tr.appendChild(td);
-        });
-        tabela.appendChild(tr);
+export function renderizarTabuleiro(matriz, notasInfo, translations, callback) {
+  let c = document.getElementById('container-tabuleiro'), t = document.createElement('table');
+  t.setAttribute('role', 'grid');
+  matriz.forEach((l, i) => {
+    let r = document.createElement('tr');
+    l.forEach((g, j) => {
+      let d = document.createElement('td'), info = notasInfo[g.nota], n = translations.notes[g.nota] + (g.isMinor ? " " + translations.notes.minor : "");
+      d.setAttribute('role', 'gridcell'); d.setAttribute('aria-label', `L${i+1} C${j+1}: ${n}`); d.setAttribute('tabindex', '0');
+      if (g.selecionada) d.classList.add('selecionada');
+      d.innerHTML = `<div class="cristal" style="background-color: ${info.cor}">${g.nota}${g.isMinor ? 'm' : ''}</div>`;
+      d.onclick = () => callback(i, j);
+      d.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') callback(i, j); };
+      r.appendChild(d);
     });
-
-    container.innerHTML = '';
-    container.appendChild(tabela);
+    t.appendChild(r);
+  });
+  c.innerHTML = ''; c.appendChild(t);
 }
-
-export function atualizarStatus(pontos, vidas, meta, translations) {
-    const elScore = document.getElementById('label-score');
-    const elVidas = document.getElementById('label-vidas');
-    const elMeta = document.getElementById('label-meta');
-
-    if (elScore) elScore.textContent = `${translations.score}: ${pontos}`;
-    if (elVidas) elVidas.textContent = `${translations.lives}: ${vidas}`;
-    if (elMeta) {
-        elMeta.textContent = meta ? `${translations.goal}: ${meta}` : '';
-    }
+export function atualizarStatus(p, v, t) {
+  document.getElementById('label-score').textContent = `${t.score}: ${p}`;
+  document.getElementById('label-vidas').textContent = `${t.lives}: ${v}`;
 }
