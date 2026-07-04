@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gems Symphony - Language First - 0114</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 20px; }
+        h1 { font-size: 1.8rem; margin-bottom: 10px; color: #00ffcc; text-align: center; }
+        
+        .creditos-panel { font-size: 0.9rem; color: #aaaaaa; margin: 15px 0; line-height: 1.5; }
+        .creditos-panel a { color: #bb86fc; text-decoration: none; font-weight: bold; }
+        .creditos-panel a:focus { text-decoration: underline; outline: 2px solid #ffffff; }
+
+        .tela-fluxo { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #1e1e1e; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-align: center; margin-top: 15px; }
+        .tela-fluxo p { margin-bottom: 15px; color: #dddddd; font-size: 1.05rem; }
+
+        .btn-fluxo { background-color: #00ffcc; color: #121212; border: none; padding: 12px 24px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 8px 0; width: 100%; box-shadow: 0 4px 6px rgba(0,255,204,0.1); }
+        .btn-fluxo:focus { outline: 3px solid #ffffff; }
+        .btn-fluxo.secundario { background-color: #37474f; color: #fff; box-shadow: none; }
+
+        .menu-nivel-block { margin: 15px 0; width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+        .menu-nivel-block label { font-size: 0.95rem; color: #bb86fc; font-weight: bold; }
+        .seletor-nivel { background-color: #121212; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 4px; font-size: 1rem; width: 100%; }
+        .seletor-nivel:focus { outline: 2px solid #00ffcc; }
+
+        #area-jogo { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; }
+        .painel-partida { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 12px; background-color: #1e1e1e; padding: 12px; border-radius: 6px; border: 1px solid #2d2d2d; }
+        .status-panel { font-size: 1.05rem; color: #bb86fc; margin-bottom: 4px; }
+        .challenge-panel { font-size: 0.95rem; color: #ffb74d; font-weight: bold; margin-bottom: 6px; }
+        .score-panel { font-size: 1.25rem; font-weight: bold; color: #00ffcc; margin-bottom: 4px; }
+        .lives-panel { font-size: 1.15rem; color: #ff1744; }
+        
+        #tabuleiro { display: grid; gap: 4px; width: 100%; aspect-ratio: 1 / 1; background-color: #1e1e1e; padding: 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
+        .gema-btn { border: 3px solid transparent; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; outline: none; -webkit-tap-highlight-color: transparent; }
+        .gema-btn:focus { border: 3px solid #ffffff; transform: scale(0.95); }
+        .gema-btn.selecionada { border: 3px solid #00ffcc; animation: pulse 0.5s infinite alternate; }
+
+        .gema-rubi { background-color: #ff1744; color: #fff; }
+        .gema-safira { background-color: #2979ff; color: #fff; }
+        .gema-esmeralda { background-color: #00e676; color: #000; }
+        .gema-onix { background-color: #455a64; color: #fff; }
+        .gema-topazio { background-color: #ffea00; color: #000; }
+        .gema-diamante { background-color: #e0f7fa; color: #000; }
+        .gema-vazia { background-color: #121212; color: #121212; cursor: default; }
+
+        .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; padding: 20px; }
+        .modal-conteudo { background-color: #1e1e1e; padding: 20px; border-radius: 8px; max-width: 450px; width: 100%; border: 1px solid #333; max-height: 85vh; overflow-y: auto; }
+        .modal-conteudo h2 { color: #00ffcc; margin-bottom: 12px; font-size: 1.3rem; }
+        .modal-conteudo p, .modal-conteudo ul { font-size: 0.95rem; line-height: 1.5; margin-bottom: 12px; color: #dddddd; }
+        .modal-conteudo ul { padding-left: 20px; }
+        .btn-fechar-modal { background-color: #ff1744; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-fechar-modal:focus { outline: 2px solid #ffffff; }
+
+        @keyframes pulse { from { transform: scale(0.95); } to { transform: scale(1.05); } }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+    </style>
+</head>
+<body>
+
+    <div id="anuncio-acessivel" class="sr-only" aria-live="assertive"></div>
+
+    <main id="tela-inicial" class="tela-fluxo">
+        <h1>Sinfonia das Gemas</h1>
+        
+        <div class="creditos-panel">
+            Desenvolvido por <strong>Anderson Carvalho</strong><br>
+            Feedback para: <a href="mailto:euconcego@gmail.com" aria-label="Enviar e-mail para euconcego@gmail.com">euconcego@gmail.com</a>
+        </div>
+
+        <p>Um puzzle de combinação de joias sonoro e acessível.</p>
+
+        <div class="menu-nivel-block">
+            <label id="lbl-selecao" for="select-nivel">Escolha o nível para jogar:</label>
+            <select id="select-nivel" class="seletor-nivel" aria-labelledby="lbl-selecao">
+                </select>
+        </div>
+
+        <button class="btn-fluxo" id="btn-comecar">Iniciar Partida</button>
+        <button class="btn-fluxo secundario" id="bt-abrir-ajuda" aria-haspopup="dialog">Como Jogar</button>
+    </main>
+
+    <section id="tela-vitoria" class="tela-fluxo" style="display: none;">
+        <h1>Nível Concluído!</h1>
+        <p id="txt-resumo-vitoria">Você atingiu a meta de pontuação.</p>
+        <button class="btn-fluxo" id="btn-proximo-nivel">Avançar para Próxima Fase</button>
+        <button class="btn-fluxo secundario" id="btn-vitoria-menu">Voltar ao Menu Principal</button>
+    </section>
+
+    <section id="tela-gameover" class="tela-fluxo" style="display: none;">
+        <h1>Fim de Jogo!</h1>
+        <p>Suas vidas acabaram neste nível.</p>
+        <button class="btn-fluxo" id="btn-tentar-novamente">Tentar Novamente</button>
+        <button class="btn-fluxo secundario" id="btn-gameover-menu">Voltar ao Menu Principal</button>
+    </section>
+
+    <div id="area-jogo">
+        <div class="painel-partida">
+            <div class="status-panel" id="status">Nível 1 - 4x4</div>
+            <div class="challenge-panel" id="challenge-display">Bônus: Nenhum</div>
+            <div class="score-panel" id="score-display">Pontos: 0 / Meta: 300</div>
+            <div class="lives-panel" id="lives-display">Vidas: ❤️❤️❤️❤️❤️</div>
+        </div>
+
+        <main id="tabuleiro" aria-label="Tabuleiro de joias"></main>
+    </div>
+
+    <div id="modal-ajuda" class="modal" role="dialog" aria-labelledby="titulo-ajuda" aria-modal="true">
+        <div class="modal-conteudo">
+            <h2 id="titulo-ajuda">Como Jogar Sinfonia das Gemas</h2>
+            <p>Combine joias iguais na horizontal ou vertical para marcar pontos e avançar de nível!</p>
+            <ul>
+                <li><strong>O Tabuleiro:</strong> As joias usam a notação de xadrez (A1, A2, B1...). Cada gema emite uma nota musical exclusiva.</li>
+                <li><strong>Navegação:</strong> Use as <strong>setas do teclado</strong> para se mover rapidamente pelo tabuleiro.</li>
+                <li><strong>Como Mover:</strong> Selecione uma joia e toque em uma vizinha direta para realizar a troca de posições.</li>
+                <li><strong>Sistema de Vidas:</strong> Você tem 5 vidas. Movimentos inválidos cobram 1 vida!</li>
+                <li><strong>Combos:</strong> Fazer mais de uma trinca ou reações em cadeia aumenta seus pontos drasticamente e pode recuperar vidas.</li>
+                <li><strong>Desafios:</strong> A cada nível, uma joia aleatória é sorteada para render o dobro de pontos!</li>
+            </ul>
+            <button class="btn-fechar-modal" id="bt-fechar-ajuda">Fechar Instruções</button>
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null;
+
+        const CATALOGO_JOIAS = [
+            { id: 0, nome: "Rubi", classe: "gema-rubi", frequencia: 261.63 },
+            { id: 1, nome: "Safira", classe: "gema-safira", frequencia: 329.63 },
+            { id: 2, nome: "Esmeralda", classe: "gema-esmeralda", frequencia: 392.00 },
+            { id: 3, nome: "Ônix", classe: "gema-onix", frequencia: 220.00 },
+            { id: 4, nome: "Topázio", classe: "gema-topazio", frequencia: 523.25 },
+            { id: 5, nome: "Diamante", classe: "gema-diamante", frequencia: 659.25 }
+        ];
+
+        const CONFIG_NIVEIS = [
+            { nivel: 1, tamanho: 4, variedades: 3, meta: 300 },
+            { nivel: 2, tamanho: 6, variedades: 4, meta: 800 },
+            { nivel: 3, tamanho: 8, variedades: 5, meta: 1500 },
+            { nivel: 4, tamanho: 12, variedades: 6, meta: 3000 }
+        ];
+
+        let nivelIdx = 0;
+        let pontuacao = 0;
+        let vidas = 5;
+        let joiaBonusId = -1;
+        
+        let gemaSelecionada = null;
+        let matrizGemas = [];
+        let bloqueado = false;
+        let jogoAtivo = false;
+        
+        let totalTrincasNoTurno = 0;
+        let totalPontosNoTurno = 0;
+        let multiplicadorCombo = 1; // Variável nova para melhorar a pontuação
+        
+        let timeoutsAtivos = [];
+
+        function obterCoordenadaXadrez(linha, coluna) {
+            const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+            return `${letras[coluna]}${linha + 1}`;
+        }
+
+        function inicializarAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function tocarSomJoia(frequencia) {
+            inicializarAudio();
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'triangle';
+            o.frequency.value = frequencia;
+            const agora = audioCtx.currentTime;
+            g.gain.setValueAtTime(0, agora);
+            g.gain.linearRampToValueAtTime(0.2, agora + 0.05);
+            g.gain.exponentialRampToValueAtTime(0.00001, agora + 0.35);
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.start(agora);
+            o.stop(agora + 0.4);
+        }
+
+        function tocarSomMatch() {
+            inicializarAudio();
+            const notas = [523.25, 659.25, 783.99, 1046.50];
+            const agora = audioCtx.currentTime;
+            notas.forEach((freq, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'triangle';
+                o.frequency.value = freq;
+                g.gain.setValueAtTime(0, agora + (i * 0.07));
+                g.gain.linearRampToValueAtTime(0.15, agora + (i * 0.07) + 0.03);
+                g.gain.exponentialRampToValueAtTime(0.00001, agora + (i * 0.07) + 0.25);
+                o.connect(g);
+                g.connect(audioCtx.destination);
+                o.start(agora + (i * 0.07));
+                o.stop(agora + (i * 0.07) + 0.3);
+            });
+        }
+
+        function tocarSomErro() {
+            inicializarAudio();
+            const agora = audioCtx.currentTime;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sawtooth';
+            o.frequency.setValueAtTime(150, agora);
+            o.frequency.linearRampToValueAtTime(100, agora + 0.2);
+            g.gain.setValueAtTime(0.15, agora);
+            g.gain.exponentialRampToValueAtTime(0.00001, agora + 0.2);
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.start(agora);
+            o.stop(agora + 0.2);
+        }
+
+        function anunciarTexto(texto) {
+            const painel = document.getElementById('anuncio-acessivel');
+            painel.textContent = '';
+            setTimeout(() => { painel.textContent = texto; }, 50);
+        }
+
+        function atualizarInterfacePartida() {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            document.getElementById('status').textContent = `Nível ${config.nivel} - Tabuleiro ${config.tamanho}x${config.tamanho}`;
+            document.getElementById('score-display').textContent = `Pontos: ${pontuacao} / Meta: ${config.meta}`;
+            
+            const coracoes = "❤️".repeat(vidas) + "🖤".repeat(Math.max(0, 5 - vidas));
+            document.getElementById('lives-display').textContent = `Vidas: ${coracoes}`;
+            
+            if (joiaBonusId !== -1) {
+                document.getElementById('challenge-display').textContent = `💎 Desafio: ${CATALOGO_JOIAS[joiaBonusId].nome} vale o DOBRO!`;
+            }
+        }
+
+        function obterMaxNivelLiberado() {
+            // Adicionado bloco try/catch para evitar crash caso o localStorage esteja bloqueado no navegador
+            try {
+                const salvo = localStorage.getItem('sinfoniaGemas_maxNivel');
+                if (!salvo) return 1;
+                const parsed = parseInt(salvo);
+                return isNaN(parsed) ? 1 : parsed;
+            } catch (e) {
+                return 1;
+            }
+        }
+
+        function registrarNivelLiberado(nv) {
+            // Adicionado bloco try/catch
+            try {
+                let maxAtual = obterMaxNivelLiberado();
+                if (nv > maxAtual) localStorage.setItem('sinfoniaGemas_maxNivel', nv.toString());
+            } catch (e) {
+                console.warn("Armazenamento local indisponível. O progresso não será salvo.");
+            }
+        }
+
+        function atualizarOpcoesSeletorNivel() {
+            const select = document.getElementById('select-nivel');
+            const maxLiberado = obterMaxNivelLiberado();
+            select.innerHTML = '';
+
+            CONFIG_NIVEIS.forEach((conf, idx) => {
+                if (conf.nivel === 1 || conf.nivel <= maxLiberado) {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = `Nível ${conf.nivel} (${conf.tamanho}x${conf.tamanho})`;
+                    select.appendChild(opt);
+                }
+            });
+            select.value = nivelIdx;
+        }
+
+        function inicializarMatriz() {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            matrizGemas = [];
+            for (let l = 0; l < config.tamanho; l++) {
+                matrizGemas[l] = [];
+                for (let c = 0; c < config.tamanho; c++) {
+                    let idValido;
+                    do {
+                        idValido = Math.floor(Math.random() * config.variedades);
+                    } while (
+                        (c >= 2 && matrizGemas[l][c-1] === idValido && matrizGemas[l][c-2] === idValido) ||
+                        (l >= 2 && matrizGemas[l-1][c] === idValido && matrizGemas[l-2][c] === idValido)
+                    );
+                    matrizGemas[l][c] = idValido;
+                }
+            }
+        }
+
+        function renderizarTabuleiro() {
+            if (!jogoAtivo) return;
+            
+            let coordFocada = null;
+            if (document.activeElement && document.activeElement.classList.contains('gema-btn')) {
+                coordFocada = document.activeElement.dataset.coord;
+            }
+
+            const config = CONFIG_NIVEIS[nivelIdx];
+            const tabuleiro = document.getElementById('tabuleiro');
+            tabuleiro.innerHTML = '';
+            tabuleiro.style.gridTemplateColumns = `repeat(${config.tamanho}, 1fr)`;
+
+            for (let l = 0; l < config.tamanho; l++) {
+                for (let c = 0; c < config.tamanho; c++) {
+                    const idJoia = matrizGemas[l][c];
+                    const botao = document.createElement('button');
+                    const coordXadrez = obterCoordenadaXadrez(l, c);
+
+                    if (idJoia === -1) {
+                        botao.classList.add('gema-btn', 'gema-vazia');
+                        botao.disabled = true;
+                    } else {
+                        const joia = CATALOGO_JOIAS[idJoia];
+                        botao.classList.add('gema-btn', joia.classe);
+                        botao.dataset.linha = l;
+                        botao.dataset.coluna = c;
+                        botao.dataset.coord = coordXadrez;
+                        botao.dataset.id = idJoia;
+                        
+                        if (gemaSelecionada && gemaSelecionada.dataset.coord === coordXadrez) {
+                            botao.classList.add('selecionada');
+                            gemaSelecionada = botao; 
+                        }
+
+                        let txtBonus = (idJoia === joiaBonusId) ? " Bônus!" : "";
+                        botao.ariaLabel = `${joia.nome}${txtBonus} em ${coordXadrez}`;
+                        botao.textContent = joia.nome.charAt(0);
+                        botao.addEventListener('click', () => gerenciarCliqueGema(botao));
+                    }
+                    tabuleiro.appendChild(botao);
+                }
+            }
+
+            if (coordFocada) {
+                const btnParaFocar = document.querySelector(`.gema-btn[data-coord="${coordFocada}"]`);
+                if (btnParaFocar) btnParaFocar.focus();
+            }
+        }
+
+        document.getElementById('tabuleiro').addEventListener('keydown', function(e) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                if (!document.activeElement || !document.activeElement.classList.contains('gema-btn')) return;
+                
+                e.preventDefault(); 
+
+                const linhaAtual = parseInt(document.activeElement.dataset.linha);
+                const colunaAtual = parseInt(document.activeElement.dataset.coluna);
+                const config = CONFIG_NIVEIS[nivelIdx];
+                
+                let novaLinha = linhaAtual;
+                let novaColuna = colunaAtual;
+
+                if (e.key === 'ArrowUp' && linhaAtual > 0) novaLinha--;
+                if (e.key === 'ArrowDown' && linhaAtual < config.tamanho - 1) novaLinha++;
+                if (e.key === 'ArrowLeft' && colunaAtual > 0) novaColuna--;
+                if (e.key === 'ArrowRight' && colunaAtual < config.tamanho - 1) novaColuna++;
+
+                const proximoBotao = document.querySelector(`.gema-btn[data-linha="${novaLinha}"][data-coluna="${novaColuna}"]`);
+                if (proximoBotao) {
+                    proximoBotao.focus();
+                }
+            }
+        });
+
+        function gerenciarCliqueGema(botao) {
+            if (bloqueado || !jogoAtivo) return;
+
+            const id = parseInt(botao.dataset.id);
+            const joia = CATALOGO_JOIAS[id];
+            const coord = botao.dataset.coord;
+
+            tocarSomJoia(joia.frequencia);
+
+            if (!gemaSelecionada) {
+                gemaSelecionada = botao;
+                botao.classList.add('selecionada');
+                anunciarTexto(`Selecionado ${joia.nome} em ${coord}`);
+            } else {
+                if (gemaSelecionada === botao) {
+                    botao.classList.remove('selecionada');
+                    gemaSelecionada = null;
+                    anunciarTexto("Seleção cancelada");
+                    return;
+                }
+
+                const l1 = parseInt(gemaSelecionada.dataset.linha);
+                const c1 = parseInt(gemaSelecionada.dataset.coluna);
+                const l2 = parseInt(botao.dataset.linha);
+                const c2 = parseInt(botao.dataset.coluna);
+
+                const ehVizinho = (Math.abs(l1 - l2) === 1 && c1 === c2) || (Math.abs(c1 - c2) === 1 && l1 === l2);
+
+                if (ehVizinho) {
+                    bloqueado = true;
+                    gemaSelecionada.classList.remove('selecionada');
+                    
+                    const temp = matrizGemas[l1][c1];
+                    matrizGemas[l1][c1] = matrizGemas[l2][c2];
+                    matrizGemas[l2][c2] = temp;
+
+                    renderizarTabuleiro();
+
+                    totalTrincasNoTurno = 0;
+                    totalPontosNoTurno = 0;
+                    multiplicadorCombo = 1; // Reseta o combo ao iniciar movimento
+
+                    let t1 = setTimeout(() => {
+                        if (!jogoAtivo) return;
+                        if (checarMatches()) {
+                            gemaSelecionada = null;
+                            processarTurno(); 
+                        } else {
+                            vidas--;
+                            tocarSomErro();
+                            atualizarInterfacePartida();
+                            
+                            let avisoVida = vidas > 0 ? `Troca sem match. Restam ${vidas} vidas.` : "";
+                            anunciarTexto(`Movimento inválido. ${avisoVida}`);
+                            
+                            gemaSelecionada = null;
+                            if (vidas <= 0) {
+                                mudarTela('gameover');
+                            } else {
+                                bloqueado = false;
+                            }
+                        }
+                    }, 150);
+                    timeoutsAtivos.push(t1);
+                } else {
+                    gemaSelecionada.classList.remove('selecionada');
+                    gemaSelecionada = botao;
+                    botao.classList.add('selecionada');
+                    anunciarTexto(`Distante. Selecionado: ${joia.nome} em ${coord}`);
+                }
+            }
+        }
+
+        function checarMatches() {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            let encontrouMatch = false;
+            let paraEliminar = Array(config.tamanho).fill().map(() => Array(config.tamanho).fill(false));
+
+            for (let l = 0; l < config.tamanho; l++) {
+                for (let c = 0; c < config.tamanho - 2; c++) {
+                    let id = matrizGemas[l][c];
+                    if (id !== -1 && id === matrizGemas[l][c+1] && id === matrizGemas[l][c+2]) {
+                        paraEliminar[l][c] = true;
+                        paraEliminar[l][c+1] = true;
+                        paraEliminar[l][c+2] = true;
+                        encontrouMatch = true;
+                    }
+                }
+            }
+
+            for (let c = 0; c < config.tamanho; c++) {
+                for (let l = 0; l < config.tamanho - 2; l++) {
+                    let id = matrizGemas[l][c];
+                    if (id !== -1 && id === matrizGemas[l+1][c] && id === matrizGemas[l+2][c]) {
+                        paraEliminar[l][c] = true;
+                        paraEliminar[l+1][c] = true;
+                        paraEliminar[l+2][c] = true;
+                        encontrouMatch = true;
+                    }
+                }
+            }
+
+            if (encontrouMatch) {
+                let blocosEliminados = 0;
+                let pontosBase = 0;
+
+                for (let l = 0; l < config.tamanho; l++) {
+                    for (let c = 0; c < config.tamanho; c++) {
+                        if (paraEliminar[l][c]) {
+                            let idJoia = matrizGemas[l][c];
+                            pontosBase += (idJoia === joiaBonusId) ? 20 : 10;
+                            matrizGemas[l][c] = -1;
+                            blocosEliminados++;
+                        }
+                    }
+                }
+
+                // Aplica o multiplicador de combos para tornar a pontuação responsiva
+                let pontosDestePasso = pontosBase * multiplicadorCombo;
+                
+                totalTrincasNoTurno += Math.max(1, Math.floor(blocosEliminados / 3));
+                totalPontosNoTurno += pontosDestePasso;
+                pontuacao += pontosDestePasso;
+                tocarSomMatch();
+            }
+
+            return encontrouMatch;
+        }
+
+        function aplicarGravidade() {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            for (let c = 0; c < config.tamanho; c++) {
+                for (let l = config.tamanho - 1; l >= 0; l--) {
+                    if (matrizGemas[l][c] === -1) {
+                        for (let k = l - 1; k >= 0; k--) {
+                            if (matrizGemas[k][c] !== -1) {
+                                matrizGemas[l][c] = matrizGemas[k][c];
+                                matrizGemas[k][c] = -1;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            for (let c = 0; c < config.tamanho; c++) {
+                for (let l = 0; l < config.tamanho; l++) {
+                    if (matrizGemas[l][c] === -1) {
+                        matrizGemas[l][c] = Math.floor(Math.random() * config.variedades);
+                    }
+                }
+            }
+        }
+
+        function processarTurno() {
+            if (!jogoAtivo) return;
+            renderizarTabuleiro();
+            
+            let t2 = setTimeout(() => {
+                if (!jogoAtivo) return;
+                aplicarGravidade();
+                renderizarTabuleiro();
+
+                let t3 = setTimeout(() => {
+                    if (!jogoAtivo) return;
+                    
+                    if (checarMatches()) {
+                        multiplicadorCombo++; // Aumenta o combo nas reações em cadeia!
+                        processarTurno(); 
+                    } else {
+                        const configAtual = CONFIG_NIVEIS[nivelIdx];
+                        
+                        // Atualiza o texto anunciando os pontos ganho E O TOTAL, para evitar leitura cega do placar
+                        let msg = `Finalizado! ${totalTrincasNoTurno} trincas. Mais ${totalPontosNoTurno} pontos. Pontuação total: ${pontuacao} de ${configAtual.meta}.`;
+                        
+                        if (totalTrincasNoTurno > 1) {
+                            if (vidas < 5) {
+                                vidas++;
+                                msg += " Combo! Recuperou 1 vida.";
+                            }
+                        }
+
+                        anunciarTexto(msg);
+                        atualizarInterfacePartida();
+                        
+                        bloqueado = false; 
+
+                        if (pontuacao >= configAtual.meta) {
+                            // Delay de 500ms permite o leitor de tela terminar de falar a pontuação antes de mudar a tela
+                            setTimeout(() => mudarTela('vitoria'), 500);
+                        }
+                    }
+                }, 220);
+                timeoutsAtivos.push(t3);
+            }, 220);
+            timeoutsAtivos.push(t2);
+        }
+
+        function limparTodosTimeouts() {
+            timeoutsAtivos.forEach(id => clearTimeout(id));
+            timeoutsAtivos = [];
+        }
+
+        function mudarTela(destino) {
+            if (destino !== 'jogo') {
+                jogoAtivo = false;
+                limparTodosTimeouts();
+            }
+
+            document.getElementById('tela-inicial').style.display = 'none';
+            document.getElementById('tela-vitoria').style.display = 'none';
+            document.getElementById('tela-gameover').style.display = 'none';
+            document.getElementById('area-jogo').style.display = 'none';
+
+            if (destino === 'menu') {
+                atualizarOpcoesSeletorNivel();
+                document.getElementById('tela-inicial').style.display = 'flex';
+                document.getElementById('btn-comecar').focus();
+            } else if (destino === 'jogo') {
+                jogoAtivo = true;
+                document.getElementById('area-jogo').style.display = 'flex';
+                atualizarInterfacePartida();
+                anunciarTexto(`Partida iniciada. Nível ${CONFIG_NIVEIS[nivelIdx].nivel}. Tabuleiro na tela.`);
+                
+                setTimeout(() => {
+                    const primeiraGema = document.querySelector('.gema-btn');
+                    if (primeiraGema) primeiraGema.focus();
+                }, 100);
+
+            } else if (destino === 'vitoria') {
+                const configPassada = CONFIG_NIVEIS[nivelIdx];
+                document.getElementById('txt-resumo-vitoria').textContent = `Você completou o Nível ${configPassada.nivel} com ${pontuacao} pontos!`;
+                
+                if (nivelIdx < CONFIG_NIVEIS.length - 1) {
+                    registrarNivelLiberado(CONFIG_NIVEIS[nivelIdx + 1].nivel);
+                }
+                
+                document.getElementById('tela-vitoria').style.display = 'flex';
+                document.getElementById('btn-proximo-nivel').focus();
+                anunciarTexto(`Vitória! Nível ${configPassada.nivel} Concluído.`);
+            } else if (destino === 'gameover') {
+                document.getElementById('tela-gameover').style.display = 'flex';
+                document.getElementById('btn-tentar-novamente').focus();
+                anunciarTexto("Fim de jogo. Suas vidas acabaram.");
+            }
+        }
+
+        function comecarNovaPartida() {
+            pontuacao = 0;
+            vidas = 5;
+            bloqueado = false;
+            gemaSelecionada = null;
+            jogoAtivo = true;
+            
+            sortearDesafioAleatorio();
+            inicializarMatriz();
+            mudarTela('jogo');
+            renderizarTabuleiro();
+        }
+
+        function sortearDesafioAleatorio() {
+            joiaBonusId = Math.floor(Math.random() * CONFIG_NIVEIS[nivelIdx].variedades);
+        }
+
+        const modal = document.getElementById('modal-ajuda');
+        const btnAbrir = document.getElementById('bt-abrir-ajuda');
+        const btnFechar = document.getElementById('bt-fechar-ajuda');
+        const seletorNivel = document.getElementById('select-nivel');
+
+        btnAbrir.onclick = () => {
+            modal.style.display = 'flex';
+            btnFechar.focus();
+            anunciarTexto("Ajuda aberta.");
+        };
+        btnFechar.onclick = () => {
+            modal.style.display = 'none';
+            btnAbrir.focus();
+            anunciarTexto("Ajuda fechada.");
+        };
+
+        document.getElementById('btn-comecar').onclick = () => {
+            inicializarAudio();
+            const val = seletorNivel.value;
+            nivelIdx = val ? parseInt(val) : 0;
+            comecarNovaPartida();
+        };
+
+        document.getElementById('btn-proximo-nivel').onclick = () => {
+            if (nivelIdx < CONFIG_NIVEIS.length - 1) {
+                nivelIdx++;
+                comecarNovaPartida();
+            } else {
+                mudarTela('menu');
+            }
+        };
+
+        document.getElementById('btn-tentar-novamente').onclick = comecarNovaPartida;
+        document.getElementById('btn-vitoria-menu').onclick = () => mudarTela('menu');
+        document.getElementById('btn-gameover-menu').onclick = () => mudarTela('menu');
+
+        window.onload = () => {
+            registrarNivelLiberado(1);
+            atualizarOpcoesSeletorNivel(); 
+            mudarTela('menu');
+        };
+    </script>
+</body>
+</html>
