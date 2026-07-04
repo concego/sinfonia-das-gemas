@@ -1,4 +1,3 @@
-<!-- Update Language System: Sat Jul  4 00:16:07 UTC 2026 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -75,14 +74,6 @@
         <p>Um puzzle de combinação de joias sonoro e acessível.</p>
 
         <div class="menu-nivel-block">
-            <label id="lbl-dificuldade" for="select-dificuldade">Dificuldade:</label>
-            <select id="select-dificuldade" class="seletor-nivel" aria-labelledby="lbl-dificuldade">
-                <option value="facil">Fácil (Mais vidas)</option>
-                <option value="medio">Médio (Vidas na gema bônus)</option>
-                <option value="dificil">Difícil (Sem bônus de vida)</option>
-            </select>
-        </div>
-        <div class="menu-nivel-block">
             <label id="lbl-selecao" for="select-nivel">Escolha o nível para jogar:</label>
             <select id="select-nivel" class="seletor-nivel" aria-labelledby="lbl-selecao">
                 </select>
@@ -153,7 +144,6 @@
         ];
 
         let nivelIdx = 0;
-        let dificuldade = "facil"; // facil, medio, dificil
         let pontuacao = 0;
         let vidas = 5;
         let joiaBonusId = -1;
@@ -165,7 +155,6 @@
         
         let totalTrincasNoTurno = 0;
         let totalPontosNoTurno = 0;
-        let atingiuBonusNoTurno = false;
         let multiplicadorCombo = 1; // Variável nova para melhorar a pontuação
         
         let timeoutsAtivos = [];
@@ -422,7 +411,6 @@
                     totalTrincasNoTurno = 0;
                     totalPontosNoTurno = 0;
                     multiplicadorCombo = 1; // Reseta o combo ao iniciar movimento
-                    atingiuBonusNoTurno = false;
 
                     let t1 = setTimeout(() => {
                         if (!jogoAtivo) return;
@@ -492,7 +480,7 @@
                     for (let c = 0; c < config.tamanho; c++) {
                         if (paraEliminar[l][c]) {
                             let idJoia = matrizGemas[l][c];
-                            if (idJoia === joiaBonusId) { pontosBase += 20; atingiuBonusNoTurno = true; } else { pontosBase += 10; }
+                            pontosBase += (idJoia === joiaBonusId) ? 20 : 10;
                             matrizGemas[l][c] = -1;
                             blocosEliminados++;
                         }
@@ -689,4 +677,3 @@
     </script>
 </body>
 </html>
-<!-- Build: Sat Jul  4 00:07:43 UTC 2026 -->
