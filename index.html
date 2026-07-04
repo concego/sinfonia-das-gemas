@@ -148,7 +148,8 @@
                 statusBonus: "Bônus: Nenhum", statusBonusAtivo: "💎 Desafio: {gema} vale o DOBRO!",
                 statusPontos: "Pontos", statusVidas: "Vidas", btnAbandonar: "Sair do Jogo",
                 msgCombo: " Combo! Recuperou 1 vida.", msgGemaBonus: " Gema Bônus! Recuperou 1 vida.",
-                msgFinal: "Finalizado! {trincas} trincas. Mais {pontos} pontos. Total: {total} de {meta}."
+                msgFinal: "Finalizado! {trincas} trincas. Mais {pontos} pontos. Total: {total} de {meta}.",
+                gemas: ["Rubi", "Safira", "Esmeralda", "Ônix", "Topázio", "Diamante"]
             },
             'en-US': {
                 titulo: "Gems Symphony", creditos: "Developed by", feedback: "Feedback to:",
@@ -173,7 +174,8 @@
                 statusBonus: "Bonus: None", statusBonusAtivo: "💎 Challenge: {gema} worth DOUBLE!",
                 statusPontos: "Score", statusVidas: "Lives", btnAbandonar: "Quit Game",
                 msgCombo: " Combo! Recovered 1 life.", msgGemaBonus: " Bonus Gem! Recovered 1 life.",
-                msgFinal: "Finished! {trincas} matches. {pontos} more points. Total: {total} of {meta}."
+                msgFinal: "Finished! {trincas} matches. {pontos} more points. Total: {total} of {meta}.",
+                gemas: ["Ruby", "Sapphire", "Emerald", "Onyx", "Topaz", "Diamond"]
             }
         };
 
@@ -343,7 +345,8 @@
                         img.src = GEMAS[id].img;
                         img.alt = "";
                         gema.appendChild(img);
-                        gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: ${GEMAS[id].nome}`);
+                        const nomeTraduzido = TEXTOS[idiomaAtual].gemas[id];
+                        gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: ${nomeTraduzido}`);
                     } else {
                         gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: Vazio`);
                     }
@@ -503,7 +506,8 @@
             const t = TEXTOS[idiomaAtual];
             const config = CONFIG_NIVEIS[nivelIdx];
             document.getElementById('status-fase').innerText = `${t.statusNivel} ${config.nivel} - ${t.statusTabuleiro} ${config.tamanho}x${config.tamanho}`;
-            document.getElementById('status-desafio').innerText = joiaBonusId !== -1 ? t.statusBonusAtivo.replace("{gema}", GEMAS[joiaBonusId].nome) : t.statusBonus;
+            const nomeGemaBonus = joiaBonusId !== -1 ? t.gemas[joiaBonusId] : "";
+            document.getElementById('status-desafio').innerText = joiaBonusId !== -1 ? t.statusBonusAtivo.replace("{gema}", nomeGemaBonus) : t.statusBonus;
             document.getElementById('label-pontos').innerText = t.statusPontos;
             document.getElementById('pontos-atual').innerText = pontuacao;
             document.getElementById('pontos-meta').innerText = config.meta;
