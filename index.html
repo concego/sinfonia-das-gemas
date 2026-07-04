@@ -61,8 +61,8 @@
     <main id="tela-inicial" class="tela-fluxo" style="display: none;">
         <h1 id="titulo-main">Sinfonia das Gemas</h1>
         <div class="creditos-panel" id="creditos-panel">
-            Desenvolvido por <strong>Anderson Carvalho</strong><br>
-            Feedback para: <a href="mailto:euconcego@gmail.com">euconcego@gmail.com</a>
+            <span id="txt-desenvolvido">Desenvolvido por</span> <strong>Anderson Carvalho</strong><br>
+            <span id="txt-feedback">Feedback para:</span> <a href="mailto:euconcego@gmail.com">euconcego@gmail.com</a>
         </div>
         <p id="subtitulo-main">Um puzzle de combinação de joias sonoro e acessível.</p>
 
@@ -240,6 +240,11 @@
             const t = TEXTOS[idiomaAtual];
             document.getElementById('titulo-main').innerText = t.titulo;
             document.getElementById('subtitulo-main').innerText = t.subtitulo;
+            
+            // Créditos traduzidos
+            document.getElementById('txt-desenvolvido').innerText = t.creditos;
+            document.getElementById('txt-feedback').innerText = t.feedback;
+
             document.getElementById('lbl-dificuldade').innerText = t.lblDificuldade;
             document.getElementById('lbl-selecao').innerText = t.lblNivel;
             document.getElementById('btn-comecar').innerText = t.btnIniciar;
