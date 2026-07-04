@@ -1,54 +1,56 @@
-# 🎼 Sinfonia das Gemas | Gems Symphony 💎
+# Sinfonia das Gemas / Gems Symphony 💎🎵
 
-> **Digital Inclusion through Music and Logic.**  
-> A project by **Eu Concego Jogar** 🐉
+Um puzzle de combinação de joias (estilo *Match-3*) sonoro e totalmente focado em acessibilidade. Construído nativamente para ser 100% jogável por pessoas cegas ou com baixa visão, o jogo utiliza feedback em áudio contínuo, navegação otimizada e compatibilidade fluida com leitores de tela.
 
-[![Accessibility: High](https://img.shields.io/badge/Accessibility-High-brightgreen.svg)](#acessibilidade--accessibility)
-[![Platform: PWA](https://img.shields.io/badge/Platform-PWA-blue.svg)](#pwa)
+## 🌟 Novidades da Versão Atual
+
+* **Suporte Bilíngue:** Jogue totalmente em Português (Brasil) ou English. Textos, alertas de leitores de tela, nomes das gemas e menus são alterados dinamicamente sem recarregar a página.
+* **Sistema de Dificuldades:**
+  * **Fácil:** Fazer mais de uma trinca no mesmo turno (Combos) recupera 1 vida.
+  * **Médio:** Fazer combinações incluindo a Gema Bônus da fase recupera 1 vida.
+  * **Difícil:** O desafio definitivo, sem recuperação de vidas durante a partida.
+
+## 🎮 Funcionalidades Principais
+
+* **Compatibilidade Mobile e PC:** O layout se adapta a qualquer tela e a interação funciona de forma nativa tanto no teclado numérico/setas quanto no toque (TalkBack, VoiceOver).
+* **Mapeamento Sonoro sem Arquivos Externos:** Cada tipo de joia emite uma frequência musical única sintetizada em tempo real via *Web Audio API*, permitindo o reconhecimento rápido das peças pela audição, garantindo um código leve e de arquivo único.
+* **Leitura de Tela Dinâmica:** O uso estratégico de `aria-live` anuncia seleções, movimentos inválidos, pontuações e status do tabuleiro de forma limpa e no tempo certo.
+* **Progressão Estratégica:** 5 níveis de dificuldade progressiva, expandindo o tabuleiro de 4x4 até 8x8 e adicionando mais tipos de gemas.
+
+## 🛠️ Tecnologias Utilizadas
+
+* **HTML5:** Estrutura semântica rigorosa para facilitar a interceptação por tecnologias assistivas.
+* **CSS3:** Design responsivo de alto contraste e foco customizado que evita *layout shifts* prejudiciais à navegação.
+* **JavaScript (Vanilla):** Algoritmos de matrizes, controle de gravidade das gemas, verificação de combos em cascata e gerenciamento de estado.
+* **Web Audio API:** Sintetização de osciladores no navegador para alertas e melodias musicais correspondentes a cada gema.
+
+## 🚀 Como Jogar
+
+**No Computador:**
+1. **Navegue pelo tabuleiro** usando as **Setas Direcionais** do teclado. O jogo utiliza o sistema de notação de xadrez (A1, B2, etc.).
+2. **Selecione uma joia** pressionando `Enter` ou `Espaço`.
+3. **Mova o foco até uma joia vizinha** (horizontal ou vertical) e pressione `Enter` ou `Espaço` novamente para realizar a troca.
+
+**No Celular:**
+1. Deslize o dedo pela tela ou faça o gesto de varredura para explorar e ouvir as joias e suas coordenadas.
+2. Dê um **duplo toque** para selecionar a primeira gema.
+3. Foque na joia adjacente e dê outro **duplo toque** para confirmar a troca.
+
+**Regras Gerais:**
+* Combine 3 ou mais joias iguais em linha ou coluna para ganhar pontos.
+* Movimentos que não resultam em combinação descontam 1 vida!
+* Fique de olho na Gema Bônus de cada fase: ela vale o dobro de pontos.
+* Cumpra a meta de pontuação antes de perder suas 5 vidas.
+
+## 📥 Como Rodar o Projeto
+
+Como a aplicação é construída puramente com tecnologias web nativas em um arquivo único, não é necessário instalar dependências ou rodar servidores complexos.
+
+1. Faça o clone do repositório:
+   ```bash
+   git clone https://github.com/concego/sinfonia-das-gemas.git
+   ```
+2. Abra o arquivo `index.html` em qualquer navegador moderno.
 
 ---
-
-## 🇧🇷 Sobre o Projeto
-O **Sinfonia das Gemas** não é apenas um jogo de Match-3. É uma experiência de **Inclusão Digital** que une teoria musical, raciocínio lógico e acessibilidade universal. Desenvolvido para ser jogado por qualquer pessoa, independentemente de sua capacidade visual, o jogo transforma cores em notas e movimentos em harmonias.
-
-### 🎮 Modos de Jogo
-*   **Sinfonia Clássica (Padrão):** O viciante Match-3 com power-ups musicais (Diapasão, Metrônomo e Clave de Sol).
-*   **Sudoku Musical (Maestro):** Um desafio de lógica 3x3 onde nenhuma nota pode se repetir na linha ou coluna.
-*   **Modo Compositor:** Siga a partitura e construa progressões de acordes Reais (ex: C-G-Am-F).
-*   **Modo Zen:** Relaxe e sinta as frequências sem pressão de tempo.
-
-### ♿ Acessibilidade
-*   **Semântica de Tabela:** O tabuleiro é construído como uma `<table>` HTML, permitindo navegação precisa por coordenadas via **TalkBack (Android)** e **NVDA (Windows)**.
-*   **Som de Alta Fidelidade:** Engine de áudio baseada em síntese aditiva (Web Audio API), proporcionando uma experiência auditiva agradável.
-*   **Interface Bilingue:** Suporte total para Português (Dó, Ré, Mi...) e Inglês (C, D, E...).
-
----
-
-## 🇺🇸 About the Project
-**Gems Symphony** is a Digital Inclusion experience that blends music theory, logic, and universal accessibility.
-
-### 🎮 Game Modes
-*   **Classic Symphony (Standard):** Addictive Match-3 with musical power-ups.
-*   **Musical Sudoku (Maestro):** A 3x3 logic challenge.
-*   **Composer Mode:** Follow the sheet music and build real chord progressions.
-
----
-
-## 👥 Créditos | Credits
-*   **Anderson Carvalho:** Lógica de Programação, Arquitetura e Engenharia de Áudio.
-*   **Adriele:** Concepção Criativa, UX Inclusiva (Neurodiversidade) e Design de Modos de Jogo.
-*   **Equipe Eu Concego Jogar:** Produção e Visão de Acessibilidade.
-
----
-
-## 📬 Feedback & Contato
-Sua opinião é fundamental para tornarmos a web mais inclusiva!
-*   **Canal Eu Concego Jogar:** Procure por "Eu Concego Jogar" no YouTube.
-*   **Mascote:** 🐉
-
----
-
-## 🛠️ Instalação | Installation (PWA)
-1. Acesse o link do jogo pelo navegador do seu celular.
-2. Selecione "Adicionar à tela de início".
-3. Jogue offline a qualquer hora!
+**Desenvolvido por Anderson Carvalho | Eu Concego Jogar 🐉**
