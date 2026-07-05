@@ -393,6 +393,7 @@
 
             setTimeout(() => {
                 if (checarMatches()) {
+                    tocarAcerto(1);
                     multiplicadorCombo = 1;
                     atingiuBonusNoTurno = false;
                     processarTurno();
@@ -462,6 +463,7 @@
                 setTimeout(() => {
                     if (checarMatches()) {
                         multiplicadorCombo++;
+                        tocarAcerto(multiplicadorCombo);
                         processarTurno();
                     } else {
                         const t = TEXTOS[idiomaAtual];
@@ -548,20 +550,29 @@
             e.preventDefault();
         }
 
-        function tocarSom(f) {
+        function tocarSom(f, dur = 0.3, type = 'sine') {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
+            osc.type = type;
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.frequency.value = f;
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            osc.start();
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        function tocarAcerto(combo) {
+            const frequencias = [523.25, 659.25, 783.99, 1046.50]; // Dó, Mi, Sol, Dó (C5 a C6)
+            const nota = frequencias[Math.min(combo - 1, frequencias.length - 1)];
+            tocarSom(nota, 0.4, 'triangle');
         }
 
         function tocarErro() {
-            tocarSom(150); tocarSom(100);
+            tocarSom(150, 0.4, 'sawtooth');
+            setTimeout(() => tocarSom(100, 0.4, 'sawtooth'), 100);
         }
 
         function anunciarTexto(txt) {
