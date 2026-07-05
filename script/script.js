@@ -24,7 +24,7 @@
                 statusPontos: "Pontos", statusVidas: "Vidas", btnAbandonar: "Sair do Jogo",
                 msgCombo: " Combo! Recuperou 1 vida.", msgGemaBonus: " Gema Bônus! Recuperou 1 vida.",
                 msgFinal: "Finalizado! {trincas} trincas. Mais {pontos} pontos. Total: {total} de {meta}.",
-                gemas: ["Rubi", "Safira", "Esmeralda", "Topázio", "Diamante"]
+                gemas: ["Rubi", "Safira", "Esmeralda", "Ônix", "Topázio", "Diamante"]
             },
             'en-US': {
                 titulo: "Gems Symphony", creditos: "Developed by", feedback: "Feedback to:",
@@ -50,7 +50,7 @@
                 statusPontos: "Score", statusVidas: "Lives", btnAbandonar: "Quit Game",
                 msgCombo: " Combo! Recovered 1 life.", msgGemaBonus: " Bonus Gem! Recovered 1 life.",
                 msgFinal: "Finished! {trincas} matches. {pontos} more points. Total: {total} of {meta}.",
-                gemas: ["Ruby", "Sapphire", "Emerald", "Topaz", "Diamond"]
+                gemas: ["Ruby", "Sapphire", "Emerald", "Onyx", "Topaz", "Diamond"]
             }
         };
 
@@ -59,15 +59,16 @@
             { nivel: 2, tamanho: 6, meta: 400, tipos: 4 },
             { nivel: 3, tamanho: 7, meta: 600, tipos: 5 },
             { nivel: 4, tamanho: 7, meta: 800, tipos: 5 },
-            { nivel: 5, tamanho: 8, meta: 1000, tipos: 5 }
+            { nivel: 5, tamanho: 8, meta: 1000, tipos: 6 }
         ];
 
         const GEMAS = [
             { id: 0, nome: "Rubi", cor: "#ff4d4d", nota: 261.63, img: "assets/ruby.png" },
             { id: 1, nome: "Safira", cor: "#4d79ff", nota: 293.66, img: "assets/sapphire.png" },
             { id: 2, nome: "Esmeralda", cor: "#4dff88", nota: 329.63, img: "assets/emerald.png" },
-            { id: 3, nome: "Topázio", cor: "#ffcc00", nota: 392.00, img: "assets/topaz.png" },
-            { id: 4, nome: "Diamante", cor: "#ffffff", nota: 440.00, img: "assets/diamond.png" }
+            { id: 3, nome: "Ônix", cor: "#a6a6a6", nota: 349.23, img: "assets/onyx.png" },
+            { id: 4, nome: "Topázio", cor: "#ffcc00", nota: 392.00, img: "assets/topaz.png" },
+            { id: 5, nome: "Diamante", cor: "#ffffff", nota: 440.00, img: "assets/diamond.png" }
         ];
 
         let nivelIdx = 0;
