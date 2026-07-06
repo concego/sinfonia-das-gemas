@@ -2,55 +2,88 @@
 
 Um puzzle de combinação de joias (estilo *Match-3*) sonoro e totalmente focado em acessibilidade. Construído nativamente para ser 100% jogável por pessoas cegas ou com baixa visão, o jogo utiliza feedback em áudio contínuo, navegação otimizada e compatibilidade fluida com leitores de tela.
 
-## 🌟 Novidades da Versão Atual
+🔗 **[Jogar agora](https://concego.github.io/sinfonia-das-gemas/)**
 
-* **Suporte Bilíngue:** Jogue totalmente em Português (Brasil) ou English. Textos, alertas de leitores de tela, nomes das gemas e menus são alterados dinamicamente sem recarregar a página.
-* **Sistema de Dificuldades:**
-  * **Fácil:** Fazer mais de uma trinca no mesmo turno (Combos) recupera 1 vida.
-  * **Médio:** Fazer combinações incluindo a Gema Bônus da fase recupera 1 vida.
-  * **Difícil:** O desafio definitivo, sem recuperação de vidas durante a partida.
+---
 
 ## 🎮 Funcionalidades Principais
 
-* **Compatibilidade Mobile e PC:** O layout se adapta a qualquer tela e a interação funciona de forma nativa tanto no teclado numérico/setas quanto no toque (TalkBack, VoiceOver).
-* **Mapeamento Sonoro sem Arquivos Externos:** Cada tipo de joia emite uma frequência musical única sintetizada em tempo real via *Web Audio API*, permitindo o reconhecimento rápido das peças pela audição, garantindo um código leve e de arquivo único.
-* **Leitura de Tela Dinâmica:** O uso estratégico de `aria-live` anuncia seleções, movimentos inválidos, pontuações e status do tabuleiro de forma limpa e no tempo certo.
-* **Progressão Estratégica:** 5 níveis de dificuldade progressiva, expandindo o tabuleiro de 4x4 até 8x8 e adicionando mais tipos de gemas.
+### Acessibilidade
+- **Tabuleiro com notação de xadrez:** Cada célula é anunciada com coordenada (A1, B2...) pelo leitor de tela.
+- **Estrutura de grade acessível:** O tabuleiro usa `<table>` com `role="grid"` para que TalkBack e NVDA anunciem linha e coluna automaticamente.
+- **Leitura de tela dinâmica:** `aria-live` anuncia seleções, resultados de jogadas, pontuações, vidas e status do tabuleiro no tempo certo.
+- **Persistência de foco:** Após cada jogada, o foco retorna à coordenada da última gema movida — o jogador nunca perde o contexto.
+- **Gema Bônus identificada:** O `aria-label` inclui a palavra "bônus" na gema especial da fase, sem depender de ícones visuais.
 
-## 🛠️ Tecnologias Utilizadas
+### Mecânicas de Jogo
+- **Movimento livre:** Trocar gemas adjacentes sem formar trinca é permitido — a troca acontece, mas custa 1 vida. A estratégia fica na mão do jogador.
+- **Aviso de distância:** Tentar mover gemas não adjacentes emite dois tons descendentes como aviso, sem penalidade.
+- **Combos em cascata:** Após uma trinca, novas combinações formadas pela gravidade geram combo com multiplicador de pontos.
+- **Gema Bônus:** Uma gema aleatória vale o dobro de pontos a cada fase.
+- **5 Níveis progressivos:** O tabuleiro vai de 4×4 até 8×8, com mais tipos de gemas a cada fase.
 
-* **HTML5:** Estrutura semântica rigorosa para facilitar a interceptação por tecnologias assistivas.
-* **CSS3:** Design responsivo de alto contraste e foco customizado que evita *layout shifts* prejudiciais à navegação.
-* **JavaScript (Vanilla):** Algoritmos de matrizes, controle de gravidade das gemas, verificação de combos em cascata e gerenciamento de estado.
-* **Web Audio API:** Sintetização de osciladores no navegador para alertas e melodias musicais correspondentes a cada gema.
+### Sistema de Dificuldades
 
-## 🚀 Como Jogar
+| Dificuldade | Recuperação de Vida |
+|---|---|
+| Fácil | Combo (mais de uma trinca no mesmo turno) recupera 1 vida |
+| Médio | Combinação incluindo a Gema Bônus recupera 1 vida |
+| Difícil | Sem recuperação de vidas |
 
-**No Computador:**
-1. **Navegue pelo tabuleiro** usando as **Setas Direcionais** do teclado. O jogo utiliza o sistema de notação de xadrez (A1, B2, etc.).
-2. **Selecione uma joia** pressionando `Enter` ou `Espaço`.
-3. **Mova o foco até uma joia vizinha** (horizontal ou vertical) e pressione `Enter` ou `Espaço` novamente para realizar a troca.
+### Controles
 
-**No Celular:**
-1. Deslize o dedo pela tela ou faça o gesto de varredura para explorar e ouvir as joias e suas coordenadas.
-2. Dê um **duplo toque** para selecionar a primeira gema.
-3. Foque na joia adjacente e dê outro **duplo toque** para confirmar a troca.
+**📱 Celular (TalkBack)**
+- Deslize para navegar entre as gemas
+- Toque duplo para selecionar e confirmar a troca
 
-**Regras Gerais:**
-* Combine 3 ou mais joias iguais em linha ou coluna para ganhar pontos.
-* Movimentos que não resultam em combinação descontam 1 vida!
-* Fique de olho na Gema Bônus de cada fase: ela vale o dobro de pontos.
-* Cumpra a meta de pontuação antes de perder suas 5 vidas.
+**💻 Computador (NVDA e outros leitores)**
+- **Setas direcionais** — navegam célula a célula; o foco para na borda
+- **Enter / Espaço** — seleciona e confirma a gema
+- **S** — anuncia a pontuação atual
+- **L** — anuncia as vidas restantes
+- **Q** — sai da partida e volta ao menu
 
-## 📥 Como Rodar o Projeto
+> **Usuários de NVDA:** Ative o **modo de foco** (Insert+Espaço) para que as setas e os atalhos funcionem no tabuleiro.
 
-Como a aplicação é construída puramente com tecnologias web nativas em um arquivo único, não é necessário instalar dependências ou rodar servidores complexos.
+### Áudio
+- **Mapeamento sonoro sem arquivos externos:** Cada gema emite uma frequência musical única sintetizada em tempo real via *Web Audio API*.
+- **Sons distintos por evento:** Acerto, erro, distância e acerto com combo têm sons diferentes.
 
-1. Faça o clone do repositório:
-   ```bash
-   git clone https://github.com/concego/sinfonia-das-gemas.git
-   ```
-2. Abra o arquivo `index.html` em qualquer navegador moderno.
+### Outros
+- **Suporte bilíngue:** Português (Brasil) e English — textos, menus e anúncios de leitor de tela são trocados dinamicamente.
+- **Arquivo único:** Sem dependências externas, sem build. Abre direto no navegador.
 
 ---
+
+## 🛠️ Tecnologias
+
+- **HTML5** — Estrutura semântica com ARIA para tecnologias assistivas
+- **CSS3** — Design responsivo de alto contraste, foco customizado
+- **JavaScript (Vanilla)** — Algoritmos de matriz, gravidade, combos em cascata e gerenciamento de estado
+- **Web Audio API** — Sintetização de osciladores para feedback sonoro
+
+---
+
+## 📥 Como Rodar Localmente
+
+```bash
+git clone https://github.com/concego/sinfonia-das-gemas.git
+cd sinfonia-das-gemas
+# Abra o index.html em qualquer navegador moderno
+```
+
+---
+
+## 📦 Histórico de Versões
+
+| Versão | Destaque |
+|---|---|
+| v0.5.1 | "Como Jogar" reestruturado em seções por dispositivo |
+| v0.5.0 | Atalhos de teclado S/L/Q e nota de modo de foco NVDA |
+| v0.4.0 | Movimento livre com custo de vida e som de distância |
+| v0.3.0 | Tabuleiro acessível com estrutura de tabela |
+| v0.2.0 | Sons e deploy estável |
+
+---
+
 **Desenvolvido por Anderson Carvalho | Eu Concego Jogar 🐉**
