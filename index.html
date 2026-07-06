@@ -141,11 +141,13 @@
                 ajudaP1: "Combine joias iguais na horizontal ou vertical para marcar pontos!",
                 ajudaItems: [
                     "<strong>O Tabuleiro:</strong> Notação de xadrez (A1, B2...). Cada gema tem um som único.",
-                    "<strong>Navegação:</strong> Use as <strong>setas do teclado</strong>.",
-                    "<strong>Como Mover:</strong> Selecione uma joia e toque em uma vizinha para trocar.",
-                    "<strong>Sistema de Vidas:</strong> Você tem 5 vidas. Movimentos inválidos custam 1 vida.",
+                    "<strong>Navegação:</strong> Use as <strong>setas do teclado</strong> para mover o foco entre as gemas. O foco para na borda do tabuleiro.",
+                    "<strong>Como Mover:</strong> Pressione <strong>Enter</strong> ou <strong>Espaço</strong> para selecionar uma gema e depois pressione novamente em uma vizinha para trocar.",
+                    "<strong>Sistema de Vidas:</strong> Você tem 5 vidas. Trocar gemas adjacentes sem formar trinca custa 1 vida. Tentar mover gemas distantes emite um aviso, sem penalidade.",
+                    "<strong>Atalhos rápidos:</strong> <strong>S</strong> = ouvir pontuação | <strong>L</strong> = ouvir vidas restantes | <strong>Q</strong> = sair da partida.",
                     "<strong>Dificuldades:</strong> Fácil (Combos dão vida), Médio (Gema Bônus dá vida), Difícil (Sem bônus).",
-                    "<strong>Desafios:</strong> Uma gema aleatória vale o DOBRO a cada nível!"
+                    "<strong>Desafios:</strong> Uma gema aleatória vale o DOBRO a cada nível!",
+                    "<strong>Usuários de NVDA:</strong> Para que as setas e os atalhos funcionem corretamente no tabuleiro, ative o <strong>modo de foco</strong> (tecla Insert+Espaço). Para ler as instruções sem o modo de foco, pressione Escape para voltar ao modo de navegação."
                 ],
                 btnFechar: "Fechar Instruções", statusNivel: "Nível", statusTabuleiro: "Tabuleiro",
                 statusBonus: "Bônus: Nenhum", statusBonusAtivo: "💎 Desafio: {gema} vale o DOBRO!",
@@ -167,11 +169,13 @@
                 ajudaP1: "Match identical gems to score points!",
                 ajudaItems: [
                     "<strong>The Board:</strong> Chess notation (A1, B2...). Each gem has a unique sound.",
-                    "<strong>Navigation:</strong> Use the <strong>arrow keys</strong>.",
-                    "<strong>How to Move:</strong> Select a gem and touch a neighbor to swap.",
-                    "<strong>Life System:</strong> You have 5 lives. Invalid moves cost 1 life.",
+                    "<strong>Navigation:</strong> Use the <strong>arrow keys</strong> to move focus between gems. Focus stops at the board edge.",
+                    "<strong>How to Move:</strong> Press <strong>Enter</strong> or <strong>Space</strong> to select a gem, then press again on a neighbor to swap.",
+                    "<strong>Life System:</strong> You have 5 lives. Swapping adjacent gems without a match costs 1 life. Trying to move distant gems plays a warning with no penalty.",
+                    "<strong>Quick shortcuts:</strong> <strong>S</strong> = hear score | <strong>L</strong> = hear remaining lives | <strong>Q</strong> = quit match.",
                     "<strong>Difficulty:</strong> Easy (Combos give lives), Medium (Bonus Gem gives lives), Hard (No bonus).",
-                    "<strong>Challenges:</strong> One random gem is worth DOUBLE each level!"
+                    "<strong>Challenges:</strong> One random gem is worth DOUBLE each level!",
+                    "<strong>NVDA users:</strong> For arrow keys and shortcuts to work correctly on the board, enable <strong>focus mode</strong> (Insert+Space). To read instructions without focus mode, press Escape to return to browse mode."
                 ],
                 btnFechar: "Close Instructions", statusNivel: "Level", statusTabuleiro: "Board",
                 statusBonus: "Bonus: None", statusBonusAtivo: "💎 Challenge: {gema} worth DOUBLE!",
@@ -575,19 +579,43 @@
         function tratarTeclado(e, l, c) {
             const config = CONFIG_NIVEIS[nivelIdx];
             let nl = l, nc = c;
-            if (e.key === "ArrowUp") nl--;
-            else if (e.key === "ArrowDown") nl++;
-            else if (e.key === "ArrowLeft") nc--;
+            if (e.key === "ArrowUp")        nl--;
+            else if (e.key === "ArrowDown")  nl++;
+            else if (e.key === "ArrowLeft")  nc--;
             else if (e.key === "ArrowRight") nc++;
-            else if (e.key === "Enter" || e.key === " ") { clicarGema(l, c); return; }
-            else return;
+            else if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                clicarGema(l, c);
+                return;
+            } else return;
 
-            if (nl >= 0 && nl < config.tamanho && nc >= 0 && nc < config.tamanho) {
-                const prox = document.getElementById(`gema-${nl}-${nc}`);
-                if (prox) prox.focus();
-            }
+            // Para na borda — não pula para a próxima linha
+            nl = Math.max(0, Math.min(config.tamanho - 1, nl));
+            nc = Math.max(0, Math.min(config.tamanho - 1, nc));
+            const prox = document.getElementById(`gema-${nl}-${nc}`);
+            if (prox) prox.focus();
             e.preventDefault();
         }
+
+        // ATALHOS GLOBAIS: S = pontuação | L = vidas | Q = sair da partida
+        document.addEventListener('keydown', (e) => {
+            if (!jogoAtivo) return;
+            const tag = document.activeElement?.tagName;
+            // Não intercepta se o foco estiver em input/select/button fora do tabuleiro
+            if (tag === 'SELECT' || tag === 'INPUT') return;
+            if (e.key === 's' || e.key === 'S') {
+                e.preventDefault();
+                const t = TEXTOS[idiomaAtual];
+                anunciarTexto(`${t.statusPontos}: ${pontuacao}`);
+            } else if (e.key === 'l' || e.key === 'L') {
+                e.preventDefault();
+                const t = TEXTOS[idiomaAtual];
+                anunciarTexto(`${t.statusVidas}: ${vidas}`);
+            } else if (e.key === 'q' || e.key === 'Q') {
+                e.preventDefault();
+                voltarAoMenu();
+            }
+        });
 
         function tocarSom(f, dur = 0.3, type = 'sine') {
             if (!audioCtx) return;
