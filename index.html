@@ -96,7 +96,7 @@
             <div id="status-vidas" class="status-item">Vidas: 5</div>
         </div>
         <!-- TABULEIRO: <table> real para anúncio de linha/coluna pelo TalkBack e VoiceOver -->
-        <table id="tabuleiro" aria-label="Tabuleiro de gemas"><tbody></tbody></table>
+        <table id="tabuleiro" role="grid" aria-label="Tabuleiro de gemas"><tbody role="rowgroup"></tbody></table>
         <button class="btn-fluxo secundario" id="btn-abandonar">Sair do Jogo</button>
     </section>
 
@@ -346,11 +346,13 @@
             for (let l = 0; l < config.tamanho; l++) {
                 // Cada linha do tabuleiro vira um <tr>
                 const tr = document.createElement('tr');
+                tr.setAttribute('role', 'row');
                 tr.setAttribute('aria-label', `Linha ${l + 1}`);
                 for (let c = 0; c < config.tamanho; c++) {
                     const id = matrizGemas[l][c];
                     // Cada célula vira um <td> contendo o <button> da gema
                     const td = document.createElement('td');
+                    td.setAttribute('role', 'gridcell');
                     const gema = document.createElement('button');
                     gema.className = 'gema';
                     gema.id = `gema-${l}-${c}`;
