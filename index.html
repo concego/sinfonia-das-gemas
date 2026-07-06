@@ -403,6 +403,9 @@
                     // FOCO: guarda a coordenada do destino da jogada para reposicionar após renderização
                     ultimoFoco = { l, c };
                     trocar(gemaSelecionada.l, gemaSelecionada.c, l, c);
+                } else {
+                    // DISTÂNCIA: gemas não adjacentes — avisa com som, sem penalidade
+                    tocarDistante();
                 }
                 gemaSelecionada.dom.classList.remove('selecionada');
                 gemaSelecionada = null;
@@ -598,7 +601,11 @@
             tocarSom(nota, 0.4, 'triangle');
         }
 
-        function tocarErro() {
+        function tocarDistante() {
+            // Som de aviso: dois tons descendentes rápidos (peças fora de alcance)
+            tocarSom(600, 0.12, 'sine');
+            setTimeout(() => tocarSom(400, 0.12, 'sine'), 130);
+        }
             tocarSom(150, 0.4, 'sawtooth');
             setTimeout(() => tocarSom(100, 0.4, 'sawtooth'), 100);
         }
