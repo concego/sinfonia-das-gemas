@@ -140,14 +140,20 @@
                 btnTentarNovamente: "Tentar Novamente", ajudaTitulo: "Como Jogar Sinfonia das Gemas",
                 ajudaP1: "Combine joias iguais na horizontal ou vertical para marcar pontos!",
                 ajudaItems: [
+                    { secao: "🎮 Regras Gerais" },
                     "<strong>O Tabuleiro:</strong> Notação de xadrez (A1, B2...). Cada gema tem um som único.",
-                    "<strong>Navegação:</strong> Use as <strong>setas do teclado</strong> para mover o foco entre as gemas. O foco para na borda do tabuleiro.",
-                    "<strong>Como Mover:</strong> Pressione <strong>Enter</strong> ou <strong>Espaço</strong> para selecionar uma gema e depois pressione novamente em uma vizinha para trocar.",
+                    "<strong>Objetivo:</strong> Troque gemas adjacentes para formar trincas na horizontal ou vertical.",
                     "<strong>Sistema de Vidas:</strong> Você tem 5 vidas. Trocar gemas adjacentes sem formar trinca custa 1 vida. Tentar mover gemas distantes emite um aviso, sem penalidade.",
-                    "<strong>Atalhos rápidos:</strong> <strong>S</strong> = ouvir pontuação | <strong>L</strong> = ouvir vidas restantes | <strong>Q</strong> = sair da partida.",
                     "<strong>Dificuldades:</strong> Fácil (Combos dão vida), Médio (Gema Bônus dá vida), Difícil (Sem bônus).",
                     "<strong>Desafios:</strong> Uma gema aleatória vale o DOBRO a cada nível!",
-                    "<strong>Usuários de NVDA:</strong> Para que as setas e os atalhos funcionem corretamente no tabuleiro, ative o <strong>modo de foco</strong> (tecla Insert+Espaço). Para ler as instruções sem o modo de foco, pressione Escape para voltar ao modo de navegação."
+                    { secao: "📱 Celular (TalkBack)" },
+                    "<strong>Navegar:</strong> Deslize para a esquerda ou direita para mover o foco entre as gemas.",
+                    "<strong>Selecionar / Confirmar:</strong> Toque duplo na gema para selecioná-la ou confirmar a troca.",
+                    { secao: "💻 Computador (NVDA e outros)" },
+                    "<strong>Navegar:</strong> Use as <strong>setas do teclado</strong> (↑ ↓ ← →) para mover o foco célula a célula. O foco para na borda.",
+                    "<strong>Selecionar / Confirmar:</strong> Pressione <strong>Enter</strong> ou <strong>Espaço</strong>.",
+                    "<strong>Atalhos rápidos:</strong> <strong>S</strong> = ouvir pontuação | <strong>L</strong> = ouvir vidas restantes | <strong>Q</strong> = sair da partida.",
+                    "<strong>Usuários de NVDA:</strong> Ative o <strong>modo de foco</strong> (Insert+Espaço) para que as setas e os atalhos funcionem no tabuleiro. Para ler estas instruções sem o modo de foco, pressione Escape para voltar ao modo de navegação."
                 ],
                 btnFechar: "Fechar Instruções", statusNivel: "Nível", statusTabuleiro: "Tabuleiro",
                 statusBonus: "Bônus: Nenhum", statusBonusAtivo: "💎 Desafio: {gema} vale o DOBRO!",
@@ -168,14 +174,20 @@
                 btnTentarNovamente: "Try Again", ajudaTitulo: "How to Play Gems Symphony",
                 ajudaP1: "Match identical gems to score points!",
                 ajudaItems: [
+                    { secao: "🎮 General Rules" },
                     "<strong>The Board:</strong> Chess notation (A1, B2...). Each gem has a unique sound.",
-                    "<strong>Navigation:</strong> Use the <strong>arrow keys</strong> to move focus between gems. Focus stops at the board edge.",
-                    "<strong>How to Move:</strong> Press <strong>Enter</strong> or <strong>Space</strong> to select a gem, then press again on a neighbor to swap.",
+                    "<strong>Objective:</strong> Swap adjacent gems to form matches of 3 or more horizontally or vertically.",
                     "<strong>Life System:</strong> You have 5 lives. Swapping adjacent gems without a match costs 1 life. Trying to move distant gems plays a warning with no penalty.",
-                    "<strong>Quick shortcuts:</strong> <strong>S</strong> = hear score | <strong>L</strong> = hear remaining lives | <strong>Q</strong> = quit match.",
                     "<strong>Difficulty:</strong> Easy (Combos give lives), Medium (Bonus Gem gives lives), Hard (No bonus).",
                     "<strong>Challenges:</strong> One random gem is worth DOUBLE each level!",
-                    "<strong>NVDA users:</strong> For arrow keys and shortcuts to work correctly on the board, enable <strong>focus mode</strong> (Insert+Space). To read instructions without focus mode, press Escape to return to browse mode."
+                    { secao: "📱 Mobile (TalkBack)" },
+                    "<strong>Navigate:</strong> Swipe left or right to move focus between gems.",
+                    "<strong>Select / Confirm:</strong> Double-tap a gem to select it or confirm the swap.",
+                    { secao: "💻 Computer (NVDA and others)" },
+                    "<strong>Navigate:</strong> Use the <strong>arrow keys</strong> (↑ ↓ ← →) to move focus cell by cell. Focus stops at the edge.",
+                    "<strong>Select / Confirm:</strong> Press <strong>Enter</strong> or <strong>Space</strong>.",
+                    "<strong>Quick shortcuts:</strong> <strong>S</strong> = hear score | <strong>L</strong> = hear remaining lives | <strong>Q</strong> = quit match.",
+                    "<strong>NVDA users:</strong> Enable <strong>focus mode</strong> (Insert+Space) for arrow keys and shortcuts to work on the board. To read these instructions without focus mode, press Escape to return to browse mode."
                 ],
                 btnFechar: "Close Instructions", statusNivel: "Level", statusTabuleiro: "Board",
                 statusBonus: "Bonus: None", statusBonusAtivo: "💎 Challenge: {gema} worth DOUBLE!",
@@ -283,9 +295,17 @@
             const lista = document.getElementById('lista-ajuda');
             lista.innerHTML = "";
             t.ajudaItems.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = item;
-                lista.appendChild(li);
+                // Se o item for uma seção, renderiza como subtítulo <h3> fora da lista
+                if (typeof item === 'object' && item.secao) {
+                    const h3 = document.createElement('h3');
+                    h3.style.cssText = 'color:#bb86fc; margin: 14px 0 6px; font-size:1rem;';
+                    h3.innerText = item.secao;
+                    lista.appendChild(h3);
+                } else {
+                    const li = document.createElement('li');
+                    li.innerHTML = item;
+                    lista.appendChild(li);
+                }
             });
 
             const selNivel = document.getElementById('select-nivel');
