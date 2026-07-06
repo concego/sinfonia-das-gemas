@@ -297,9 +297,17 @@
         function iniciarPartida() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             nivelIdx = parseInt(document.getElementById('select-nivel').value);
+            iniciarNivel();
+        }
+
+        function iniciarNivel() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             dificuldade = document.getElementById('select-dificuldade').value;
             pontuacao = 0;
             vidas = 5;
+            bloqueado = false;
+            gemaSelecionada = null;
+            ultimoFoco = { l: 0, c: 0 };
             jogoAtivo = true;
             document.getElementById('tela-inicial').style.display = 'none';
             document.getElementById('container-jogo').style.display = 'flex';
@@ -635,7 +643,7 @@
         document.getElementById('btn-vitoria-menu').onclick = voltarAoMenu;
         document.getElementById('btn-gameover-menu').onclick = voltarAoMenu;
         document.getElementById('btn-tentar-novamente').onclick = iniciarPartida;
-        document.getElementById('btn-proximo-nivel').onclick = () => { nivelIdx++; iniciarPartida(); };
+        document.getElementById('btn-proximo-nivel').onclick = () => { nivelIdx++; iniciarNivel(); };
 
         atualizarTextos();
     </script>
