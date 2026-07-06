@@ -210,6 +210,8 @@
         let bloqueado = false;
         let totalTrincasNoTurno = 0;
         let totalPontosNoTurno = 0;
+        // FOCO: guarda a coordenada da última célula tocada para reposicionar o foco após renderização
+        let ultimoFoco = { l: 0, c: 0 };
         let multiplicadorCombo = 1;
         let atingiuBonusNoTurno = false;
         let audioCtx = null;
@@ -362,7 +364,9 @@
                         img.alt = "";
                         gema.appendChild(img);
                         const nomeTraduzido = TEXTOS[idiomaAtual].gemas[id];
-                        gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: ${nomeTraduzido}`);
+                        // BONUS: adiciona "bônus" ao aria-label se esta gema é a gema bônus ativa
+                        const sufixoBonus = (id === joiaBonusId) ? ' bônus' : '';
+                        gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: ${nomeTraduzido}${sufixoBonus}`);
                     } else {
                         gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: Vazio`);
                     }
@@ -373,6 +377,9 @@
                 }
                 tbody.appendChild(tr);
             }
+            // FOCO: reposiciona o foco na coordenada da última jogada após reconstrução do DOM
+            const alvo = document.getElementById(`gema-${ultimoFoco.l}-${ultimoFoco.c}`);
+            if (alvo) alvo.focus();
         }
 
         function obterCoordenada(l, c) {
@@ -390,6 +397,8 @@
             } else {
                 const dist = Math.abs(l - gemaSelecionada.l) + Math.abs(c - gemaSelecionada.c);
                 if (dist === 1) {
+                    // FOCO: guarda a coordenada do destino da jogada para reposicionar após renderização
+                    ultimoFoco = { l, c };
                     trocar(gemaSelecionada.l, gemaSelecionada.c, l, c);
                 }
                 gemaSelecionada.dom.classList.remove('selecionada');
@@ -411,9 +420,7 @@
                     atingiuBonusNoTurno = false;
                     processarTurno();
                 } else {
-                    const temp2 = matrizGemas[l1][c1];
-                    matrizGemas[l1][c1] = matrizGemas[l2][c2];
-                    matrizGemas[l2][c2] = temp2;
+                    // MOVIMENTO INVÁLIDO: troca permanece, apenas desconta vida (sem reverter)
                     vidas--;
                     tocarErro();
                     renderizarTabuleiro();
