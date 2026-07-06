@@ -31,7 +31,9 @@
         .status-destaque { color: #00ffcc; font-weight: bold; font-size: 1.3rem; }
         #status-desafio { color: #ffcc00; font-weight: bold; font-size: 1rem; margin-top: 4px; }
 
-        #tabuleiro { display: grid; width: 100%; aspect-ratio: 1 / 1; gap: 4px; background-color: #333; padding: 4px; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.6); }
+        /* TABULEIRO: tabela real para que TalkBack/VoiceOver anuncie linha e coluna */
+        #tabuleiro { width: 100%; aspect-ratio: 1 / 1; background-color: #333; padding: 4px; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.6); border-collapse: separate; border-spacing: 4px; }
+        #tabuleiro td { padding: 0; }
         
         .gema { border: none; border-radius: 4px; cursor: pointer; position: relative; transition: transform 0.1s, filter 0.2s; display: flex; align-items: center; justify-content: center; background-color: #222; }
         .gema img { width: 80%; height: 80%; object-fit: contain; pointer-events: none; }
@@ -93,7 +95,8 @@
             </div>
             <div id="status-vidas" class="status-item">Vidas: 5</div>
         </div>
-        <div id="tabuleiro" role="grid" aria-label="Tabuleiro de gemas"></div>
+        <!-- TABULEIRO: <table> real para anúncio de linha/coluna pelo TalkBack e VoiceOver -->
+        <table id="tabuleiro" aria-label="Tabuleiro de gemas"><tbody></tbody></table>
         <button class="btn-fluxo secundario" id="btn-abandonar">Sair do Jogo</button>
     </section>
 
@@ -314,8 +317,8 @@
             const config = CONFIG_NIVEIS[nivelIdx];
             matrizGemas = [];
             const tabuleiro = document.getElementById('tabuleiro');
-            tabuleiro.style.gridTemplateColumns = `repeat(${config.tamanho}, 1fr)`;
-            tabuleiro.innerHTML = "";
+            // INIT: remove gridTemplateColumns — layout é controlado pela <table>
+            tabuleiro.querySelector('tbody').innerHTML = "";
 
             for (let l = 0; l < config.tamanho; l++) {
                 matrizGemas[l] = [];
@@ -335,13 +338,19 @@
             return false;
         }
 
+        // RENDER: reconstrói o tabuleiro como <table> a cada atualização de estado
         function renderizarTabuleiro() {
             const config = CONFIG_NIVEIS[nivelIdx];
-            const tabuleiro = document.getElementById('tabuleiro');
-            tabuleiro.innerHTML = "";
+            const tbody = document.querySelector('#tabuleiro tbody');
+            tbody.innerHTML = "";
             for (let l = 0; l < config.tamanho; l++) {
+                // Cada linha do tabuleiro vira um <tr>
+                const tr = document.createElement('tr');
+                tr.setAttribute('aria-label', `Linha ${l + 1}`);
                 for (let c = 0; c < config.tamanho; c++) {
                     const id = matrizGemas[l][c];
+                    // Cada célula vira um <td> contendo o <button> da gema
+                    const td = document.createElement('td');
                     const gema = document.createElement('button');
                     gema.className = 'gema';
                     gema.id = `gema-${l}-${c}`;
@@ -357,8 +366,10 @@
                     }
                     gema.onclick = () => clicarGema(l, c);
                     gema.onkeydown = (e) => tratarTeclado(e, l, c);
-                    tabuleiro.appendChild(gema);
+                    td.appendChild(gema);
+                    tr.appendChild(td);
                 }
+                tbody.appendChild(tr);
             }
         }
 
