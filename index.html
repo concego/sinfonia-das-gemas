@@ -341,7 +341,8 @@
         }
 
         // RENDER: reconstrói o tabuleiro como <table> a cada atualização de estado
-        function renderizarTabuleiro() {
+        // reposicionarFoco: se true, devolve o foco para ultimoFoco após reconstrução
+        function renderizarTabuleiro(reposicionarFoco = true) {
             const config = CONFIG_NIVEIS[nivelIdx];
             const tbody = document.querySelector('#tabuleiro tbody');
             tbody.innerHTML = "";
@@ -378,8 +379,10 @@
                 tbody.appendChild(tr);
             }
             // FOCO: reposiciona o foco na coordenada da última jogada após reconstrução do DOM
-            const alvo = document.getElementById(`gema-${ultimoFoco.l}-${ultimoFoco.c}`);
-            if (alvo) alvo.focus();
+            if (reposicionarFoco) {
+                const alvo = document.getElementById(`gema-${ultimoFoco.l}-${ultimoFoco.c}`);
+                if (alvo) alvo.focus();
+            }
         }
 
         function obterCoordenada(l, c) {
@@ -411,7 +414,8 @@
             const temp = matrizGemas[l1][c1];
             matrizGemas[l1][c1] = matrizGemas[l2][c2];
             matrizGemas[l2][c2] = temp;
-            renderizarTabuleiro();
+            // Primeira renderização: mostra a troca visualmente, sem reposicionar foco ainda
+            renderizarTabuleiro(false);
 
             setTimeout(() => {
                 if (checarMatches()) {
@@ -423,7 +427,8 @@
                     // MOVIMENTO INVÁLIDO: troca permanece, apenas desconta vida (sem reverter)
                     vidas--;
                     tocarErro();
-                    renderizarTabuleiro();
+                    // Renderização final com foco na coordenada de destino
+                    renderizarTabuleiro(true);
                     atualizarInterface();
                     if (vidas <= 0) fimDeJogo(false);
                     bloqueado = false;
@@ -479,7 +484,8 @@
         function processarTurno() {
             setTimeout(() => {
                 aplicarGravidade();
-                renderizarTabuleiro();
+                // Gravidade: renderiza sem foco (peças ainda podem cair em combo)
+                renderizarTabuleiro(false);
                 setTimeout(() => {
                     if (checarMatches()) {
                         multiplicadorCombo++;
@@ -506,6 +512,8 @@
                             totalTrincasNoTurno = 0;
                             totalPontosNoTurno = 0;
                             bloqueado = false;
+                            // Turno resolvido: reposiciona foco na última coordenada jogada
+                            renderizarTabuleiro(true);
                         }
                     }
                 }, 400);
