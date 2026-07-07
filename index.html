@@ -206,13 +206,14 @@
             { nivel: 5, tamanho: 8, meta: 1000, tipos: 6 }
         ];
 
+        // SVG inline por gema — formas distintas com a cor de cada uma, sem dependência de arquivos externos
         const GEMAS = [
-            { id: 0, nome: "Rubi", cor: "#ff4d4d", nota: 261.63, img: "assets/ruby.png" },
-            { id: 1, nome: "Safira", cor: "#4d79ff", nota: 293.66, img: "assets/sapphire.png" },
-            { id: 2, nome: "Esmeralda", cor: "#4dff88", nota: 329.63, img: "assets/emerald.png" },
-            { id: 3, nome: "Ônix", cor: "#a6a6a6", nota: 349.23, img: "assets/onyx.png" },
-            { id: 4, nome: "Topázio", cor: "#ffcc00", nota: 392.00, img: "assets/topaz.png" },
-            { id: 5, nome: "Diamante", cor: "#ffffff", nota: 440.00, img: "assets/diamond.png" }
+            { id: 0, nome: "Rubi",      cor: "#ff4d4d", nota: 261.63, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 95,50 50,95 5,50" fill="#ff4d4d" stroke="#fff" stroke-width="3"/></svg>' },
+            { id: 1, nome: "Safira",    cor: "#4d79ff", nota: 293.66, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 93,27 93,73 50,95 7,73 7,27" fill="#4d79ff" stroke="#fff" stroke-width="3"/></svg>' },
+            { id: 2, nome: "Esmeralda", cor: "#4dff88", nota: 329.63, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="15" width="70" height="70" fill="#4dff88" stroke="#fff" stroke-width="3"/></svg>' },
+            { id: 3, nome: "Ônix",      cor: "#a6a6a6", nota: 349.23, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#a6a6a6" stroke="#fff" stroke-width="3"/></svg>' },
+            { id: 4, nome: "Topázio",   cor: "#ffcc00", nota: 392.00, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="30,5 70,5 95,50 70,95 30,95 5,50" fill="#ffcc00" stroke="#fff" stroke-width="3"/></svg>' },
+            { id: 5, nome: "Diamante",  cor: "#ffffff", nota: 440.00, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,35 80,98 20,98 2,35" fill="#e0f7ff" stroke="#fff" stroke-width="3"/></svg>' }
         ];
 
         let nivelIdx = 0;
@@ -392,10 +393,11 @@
                     gema.className = 'gema';
                     gema.id = `gema-${l}-${c}`;
                     if (id !== -1) {
-                        const img = document.createElement('img');
-                        img.src = GEMAS[id].img;
-                        img.alt = "";
-                        gema.appendChild(img);
+                        // SVG inline: insere a forma diretamente sem depender de arquivos externos
+                        const svgWrapper = document.createElement('span');
+                        svgWrapper.innerHTML = GEMAS[id].svg;
+                        svgWrapper.style.cssText = 'display:flex;align-items:center;justify-content:center;width:80%;height:80%;pointer-events:none;';
+                        gema.appendChild(svgWrapper);
                         const nomeTraduzido = TEXTOS[idiomaAtual].gemas[id];
                         // BONUS: adiciona "bônus" ao aria-label se esta gema é a gema bônus ativa
                         const sufixoBonus = (id === joiaBonusId) ? ' bônus' : '';
