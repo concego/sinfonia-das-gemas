@@ -58,6 +58,10 @@ Cada dificuldade adiciona um conjunto de gemas com comportamento único:
 
 > **Usuários de NVDA:** Ative o **modo de foco** (Insert+Espaço) para que as setas e os atalhos funcionem no tabuleiro.
 
+**🎮 Dispositivos com controle físico (ex.: Retroid Pocket)**
+- Use o botão **"Entrar no Tabuleiro"** antes de iniciar a navegação — ele força o foco programático no tabuleiro, contornando a restrição de foco automático dos navegadores mobile.
+- Após entrar, navegue normalmente com o direcional e confirme com o botão de ação.
+
 ### Áudio
 - **Mapeamento sonoro sem arquivos externos:** Cada gema emite uma frequência musical única sintetizada em tempo real via *Web Audio API*.
 - **Sons distintos por evento:** Acerto, erro, distância e combo têm sons diferentes.
