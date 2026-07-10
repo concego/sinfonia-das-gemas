@@ -14,6 +14,8 @@ Um puzzle de combinação de joias (estilo *Match-3*) sonoro e totalmente focado
 - **Leitura de tela dinâmica:** `aria-live` anuncia seleções, resultados de jogadas, pontuações, vidas e status do tabuleiro no tempo certo.
 - **Persistência de foco:** Após cada jogada, o foco retorna à coordenada da última gema movida — o jogador nunca perde o contexto.
 - **Gema Bônus identificada:** O `aria-label` inclui a palavra "bônus" na gema especial da fase, sem depender de ícones visuais.
+- **Gema Brilhante anunciada:** Quando uma gema dourada está ativa, o leitor de tela anuncia "[nome] brilhante". O sufixo é removido automaticamente quando ela some.
+- **Botão "Entrar no Tabuleiro":** Garante foco programático no tabuleiro para dispositivos com controle físico (ex.: Retroid Pocket).
 
 ### Mecânicas de Jogo
 - **Movimento livre:** Trocar gemas adjacentes sem formar trinca é permitido — a troca acontece, mas custa 1 vida. A estratégia fica na mão do jogador.
@@ -22,13 +24,24 @@ Um puzzle de combinação de joias (estilo *Match-3*) sonoro e totalmente focado
 - **Gema Bônus:** Uma gema aleatória vale o dobro de pontos a cada fase.
 - **5 Níveis progressivos:** O tabuleiro vai de 4×4 até 8×8, com mais tipos de gemas a cada fase.
 
+### Gemas Especiais
+
+Cada dificuldade adiciona um conjunto de gemas com comportamento único:
+
+| Gema | Dificuldade | Comportamento |
+|---|---|---|
+| ✨ **Dourada** | Todas | Aparece por chance (15%) a cada turno. Vale 2× pontos. Se não for eliminada na jogada seguinte, volta ao normal. |
+| ⭐ **Coringa** | Médio e Difícil | Combina com qualquer grupo de gemas, mas a trinca inteira vale apenas 70% dos pontos. |
+| ✖ **Amaldiçoada** | Difícil | Tocar desconta 1 vida e cancela a seleção imediatamente. |
+| ? **Assombrada** | Difícil | Ao ser trocada, embaralha o tabuleiro inteiro e verifica novos matches automaticamente. |
+
 ### Sistema de Dificuldades
 
-| Dificuldade | Recuperação de Vida |
-|---|---|
-| Fácil | Combo (mais de uma trinca no mesmo turno) recupera 1 vida |
-| Médio | Combinação incluindo a Gema Bônus recupera 1 vida |
-| Difícil | Sem recuperação de vidas |
+| Dificuldade | Recuperação de Vida | Gemas Especiais |
+|---|---|---|
+| Fácil | Combo (mais de uma trinca no mesmo turno) recupera 1 vida | Dourada |
+| Médio | Combinação incluindo a Gema Bônus recupera 1 vida | Dourada + Coringa |
+| Difícil | Sem recuperação de vidas | Dourada + Coringa + Amaldiçoada + Assombrada |
 
 ### Controles
 
@@ -47,11 +60,13 @@ Um puzzle de combinação de joias (estilo *Match-3*) sonoro e totalmente focado
 
 ### Áudio
 - **Mapeamento sonoro sem arquivos externos:** Cada gema emite uma frequência musical única sintetizada em tempo real via *Web Audio API*.
-- **Sons distintos por evento:** Acerto, erro, distância e acerto com combo têm sons diferentes.
+- **Sons distintos por evento:** Acerto, erro, distância e combo têm sons diferentes.
+- **Sons das gemas especiais:** Coringa (tons ascendentes), Amaldiçoada (grave distorcido), Assombrada (acorde dissonante), Dourada (ding agudo brilhante).
 
 ### Outros
 - **Suporte bilíngue:** Português (Brasil) e English — textos, menus e anúncios de leitor de tela são trocados dinamicamente.
 - **Arquivo único:** Sem dependências externas, sem build. Abre direto no navegador.
+- **SVGs inline:** Todas as gemas (normais e especiais) usam formas geométricas puras sem dependência de fontes ou arquivos externos.
 
 ---
 
@@ -78,6 +93,8 @@ cd sinfonia-das-gemas
 
 | Versão | Destaque |
 |---|---|
+| v0.6.0 | Gemas Especiais (Dourada, Coringa, Amaldiçoada, Assombrada), sons próprios, volume dobrado |
+| v0.5.2 | Gemas com SVG inline — projeto se torna arquivo único sem dependências |
 | v0.5.1 | "Como Jogar" reestruturado em seções por dispositivo |
 | v0.5.0 | Atalhos de teclado S/L/Q e nota de modo de foco NVDA |
 | v0.4.0 | Movimento livre com custo de vida e som de distância |
