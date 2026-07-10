@@ -162,7 +162,11 @@
                 statusPontos: "Pontos", statusVidas: "Vidas", btnAbandonar: "Sair do Jogo", btnEntrarTabuleiro: "Entrar no Tabuleiro",
                 msgCombo: " Combo! Recuperou 1 vida.", msgGemaBonus: " Gema Bônus! Recuperou 1 vida.",
                 msgFinal: "Finalizado! {trincas} trincas. Mais {pontos} pontos. Total: {total} de {meta}.",
-                gemas: ["Rubi", "Safira", "Esmeralda", "Ônix", "Topázio", "Diamante"]
+                gemas: ["Rubi", "Safira", "Esmeralda", "Ônix", "Topázio", "Diamante"],
+                gemasEspeciais: { 10: "Coringa", 11: "Amaldiçoada", 12: "Assombrada", 13: "Dourada" },
+                msgAmaldicada: "Gema amaldiçoada! Perdeu 1 vida.",
+                msgAssombrada: "Gema assombrada! O tabuleiro foi embaralhado.",
+                msgDouradaSome: "A gema dourada sumiu!"
             },
             'en-US': {
                 titulo: "Gems Symphony", creditos: "Developed by", feedback: "Feedback to:",
@@ -196,7 +200,11 @@
                 statusPontos: "Score", statusVidas: "Lives", btnAbandonar: "Quit Game", btnEntrarTabuleiro: "Enter the Board",
                 msgCombo: " Combo! Recovered 1 life.", msgGemaBonus: " Bonus Gem! Recovered 1 life.",
                 msgFinal: "Finished! {trincas} matches. {pontos} more points. Total: {total} of {meta}.",
-                gemas: ["Ruby", "Sapphire", "Emerald", "Onyx", "Topaz", "Diamond"]
+                gemas: ["Ruby", "Sapphire", "Emerald", "Onyx", "Topaz", "Diamond"],
+                gemasEspeciais: { 10: "Wildcard", 11: "Cursed", 12: "Haunted", 13: "Golden" },
+                msgAmaldicada: "Cursed gem! Lost 1 life.",
+                msgAssombrada: "Haunted gem! The board was shuffled.",
+                msgDouradaSome: "The golden gem vanished!"
             }
         };
 
@@ -217,6 +225,24 @@
             { id: 4, nome: "Topázio",   cor: "#ffcc00", nota: 392.00, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="30,5 70,5 95,50 70,95 30,95 5,50" fill="#ffcc00" stroke="#fff" stroke-width="3"/></svg>' },
             { id: 5, nome: "Diamante",  cor: "#ffffff", nota: 440.00, svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,35 80,98 20,98 2,35" fill="#e0f7ff" stroke="#fff" stroke-width="3"/></svg>' }
         ];
+
+        // SVGs das gemas especiais (indexadas pelo ID especial)
+        const GEMAS_ESPECIAIS = {
+            10: { svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="#cc66ff" stroke="#fff" stroke-width="3"/><text x="50" y="58" text-anchor="middle" font-size="36" fill="#fff">★</text></svg>' },
+            11: { svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 95,50 50,95 5,50" fill="#1a1a1a" stroke="#ff0000" stroke-width="4"/><text x="50" y="60" text-anchor="middle" font-size="36" fill="#ff0000">✖</text></svg>' },
+            12: { svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 93,27 93,73 50,95 7,73 7,27" fill="#1a0033" stroke="#aa00ff" stroke-width="4"/><text x="50" y="60" text-anchor="middle" font-size="36" fill="#aa00ff">?</text></svg>' }
+        };
+
+        // IDs especiais — separados dos IDs normais das gemas (0-5)
+        const ID_CORINGA    = 10;
+        const ID_AMALDICADA = 11;
+        const ID_ASSOMBRADA = 12;
+        const ID_DOURADA    = 13; // sobreposta a uma gema normal; guardada em matrizDourada[][]
+
+        // matrizDourada[l][c] = id da gema original quando aquela célula está "dourada", -1 caso contrário
+        let matrizDourada = [];
+        // turnosRestantesDourada[l][c] = 1 (some na próxima jogada se não eliminada)
+        let matrizTurnoDourada = [];
 
         let nivelIdx = 0;
         let dificuldade = "facil";
@@ -337,12 +363,15 @@
             gemaSelecionada = null;
             ultimoFoco = { l: 0, c: 0 };
             jogoAtivo = true;
+            matrizDourada = [];
+            matrizTurnoDourada = [];
             document.getElementById('tela-inicial').style.display = 'none';
             document.getElementById('container-jogo').style.display = 'flex';
             document.getElementById('tela-vitoria').style.display = 'none';
             document.getElementById('tela-gameover').style.display = 'none';
             sortearGemaBonus();
             gerarTabuleiro();
+            tentarSortearDourada();
             atualizarInterface();
         }
 
@@ -354,19 +383,33 @@
         function gerarTabuleiro() {
             const config = CONFIG_NIVEIS[nivelIdx];
             matrizGemas = [];
+            const config = CONFIG_NIVEIS[nivelIdx];
             const tabuleiro = document.getElementById('tabuleiro');
-            // INIT: remove gridTemplateColumns — layout é controlado pela <table>
             tabuleiro.querySelector('tbody').innerHTML = "";
+
+            // Inicializa matrizes de gemas especiais
+            matrizDourada = Array.from({length: config.tamanho}, () => Array(config.tamanho).fill(-1));
+            matrizTurnoDourada = Array.from({length: config.tamanho}, () => Array(config.tamanho).fill(0));
 
             for (let l = 0; l < config.tamanho; l++) {
                 matrizGemas[l] = [];
                 for (let c = 0; c < config.tamanho; c++) {
                     let id;
-                    do { id = Math.floor(Math.random() * config.tipos); } 
+                    do { id = Math.floor(Math.random() * config.tipos); }
                     while (seriaMatch(l, c, id));
                     matrizGemas[l][c] = id;
                 }
             }
+
+            // Popula gemas especiais conforme dificuldade (Médio: Coringa; Difícil: Coringa + Amaldiçoada + Assombrada)
+            if (dificuldade === 'medio' || dificuldade === 'dificil') {
+                colocarGemaEspecialAleatoria(ID_CORINGA, 2);
+            }
+            if (dificuldade === 'dificil') {
+                colocarGemaEspecialAleatoria(ID_AMALDICADA, 2);
+                colocarGemaEspecialAleatoria(ID_ASSOMBRADA, 1);
+            }
+
             renderizarTabuleiro();
         }
 
@@ -374,6 +417,21 @@
             if (c >= 2 && matrizGemas[l][c-1] === id && matrizGemas[l][c-2] === id) return true;
             if (l >= 2 && matrizGemas[l-1][c] === id && matrizGemas[l-2][c] === id) return true;
             return false;
+        }
+
+        // Coloca `qtd` gemas especiais em posições aleatórias do tabuleiro
+        function colocarGemaEspecialAleatoria(idEspecial, qtd) {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            let colocadas = 0, tentativas = 0;
+            while (colocadas < qtd && tentativas < 100) {
+                tentativas++;
+                const l = Math.floor(Math.random() * config.tamanho);
+                const c = Math.floor(Math.random() * config.tamanho);
+                // Não sobrescreve outra especial
+                if (matrizGemas[l][c] >= 10) continue;
+                matrizGemas[l][c] = idEspecial;
+                colocadas++;
+            }
         }
 
         // RENDER: reconstrói o tabuleiro como <table> a cada atualização de estado
@@ -396,15 +454,30 @@
                     gema.className = 'gema';
                     gema.id = `gema-${l}-${c}`;
                     if (id !== -1) {
-                        // SVG inline: insere a forma diretamente sem depender de arquivos externos
                         const svgWrapper = document.createElement('span');
-                        svgWrapper.innerHTML = GEMAS[id].svg;
                         svgWrapper.style.cssText = 'display:flex;align-items:center;justify-content:center;width:80%;height:80%;pointer-events:none;';
+                        const t = TEXTOS[idiomaAtual];
+                        let nomeGema, sufixos = '';
+
+                        if (id >= 10) {
+                            // Gema especial: usa SVG e nome próprio
+                            svgWrapper.innerHTML = GEMAS_ESPECIAIS[id].svg;
+                            nomeGema = t.gemasEspeciais[id] || '?';
+                        } else {
+                            // Gema normal
+                            svgWrapper.innerHTML = GEMAS[id].svg;
+                            nomeGema = t.gemas[id];
+                            // BONUS: adiciona "bônus" ao aria-label se esta gema é a gema bônus ativa
+                            if (id === joiaBonusId) sufixos += ' bônus';
+                            // DOURADA: adiciona "dourada" se a célula tem gema dourada
+                            if (matrizDourada[l] && matrizDourada[l][c] !== -1) {
+                                sufixos += ` ${t.gemasEspeciais[13]}`;
+                                // Borda dourada visual
+                                gema.style.outline = '3px solid gold';
+                            }
+                        }
                         gema.appendChild(svgWrapper);
-                        const nomeTraduzido = TEXTOS[idiomaAtual].gemas[id];
-                        // BONUS: adiciona "bônus" ao aria-label se esta gema é a gema bônus ativa
-                        const sufixoBonus = (id === joiaBonusId) ? ' bônus' : '';
-                        gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: ${nomeTraduzido}${sufixoBonus}`);
+                        gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: ${nomeGema}${sufixos}`);
                     } else {
                         gema.setAttribute('aria-label', `${obterCoordenada(l,c)}: Vazio`);
                     }
@@ -428,9 +501,26 @@
 
         function clicarGema(l, c) {
             if (bloqueado || !jogoAtivo) return;
-            tocarSom(GEMAS[matrizGemas[l][c]].nota);
+            const id = matrizGemas[l][c];
             const gemaDOM = document.getElementById(`gema-${l}-${c}`);
-            
+
+            // AMALDIÇOADA: tocar desconta vida e cancela a seleção
+            if (id === ID_AMALDICADA) {
+                tocarAmaldicada();
+                vidas--;
+                const t = TEXTOS[idiomaAtual];
+                anunciarTexto(t.msgAmaldicada);
+                atualizarInterface();
+                if (gemaSelecionada) { gemaSelecionada.dom.classList.remove('selecionada'); gemaSelecionada = null; }
+                if (vidas <= 0) fimDeJogo(false);
+                return;
+            }
+
+            // Som de seleção: gemas especiais têm som próprio, normais usam a nota da gema
+            if (id === ID_CORINGA) tocarCoringa();
+            else if (id === ID_ASSOMBRADA) tocarAssombrada();
+            else tocarSom(GEMAS[id].nota);
+
             if (!gemaSelecionada) {
                 gemaSelecionada = { l, c, dom: gemaDOM };
                 gemaDOM.classList.add('selecionada');
@@ -451,23 +541,52 @@
 
         function trocar(l1, c1, l2, c2) {
             bloqueado = true;
+
+            // ASSOMBRADA: se uma das gemas for assombrada, embaralha em vez de trocar normalmente
+            if (matrizGemas[l1][c1] === ID_ASSOMBRADA || matrizGemas[l2][c2] === ID_ASSOMBRADA) {
+                embaralharTabuleiro();
+                const t = TEXTOS[idiomaAtual];
+                anunciarTexto(t.msgAssombrada);
+                renderizarTabuleiro(false);
+                setTimeout(() => {
+                    if (checarMatches()) {
+                        tocarAcerto(1);
+                        multiplicadorCombo = 1;
+                        atingiuBonusNoTurno = false;
+                        processarTurno();
+                    } else {
+                        renderizarTabuleiro(true);
+                        bloqueado = false;
+                    }
+                }, 300);
+                return;
+            }
+
             const temp = matrizGemas[l1][c1];
             matrizGemas[l1][c1] = matrizGemas[l2][c2];
             matrizGemas[l2][c2] = temp;
+
+            // Propaga dourada junto com a gema normal
+            const tempD = matrizDourada[l1][c1];
+            matrizDourada[l1][c1] = matrizDourada[l2][c2];
+            matrizDourada[l2][c2] = tempD;
+
             // Primeira renderização: mostra a troca visualmente, sem reposicionar foco ainda
             renderizarTabuleiro(false);
 
             setTimeout(() => {
+                // Avança turno das douradas e some as que expiraram
+                avancarTurnoDouradas();
+
                 if (checarMatches()) {
                     tocarAcerto(1);
                     multiplicadorCombo = 1;
                     atingiuBonusNoTurno = false;
                     processarTurno();
                 } else {
-                    // MOVIMENTO INVÁLIDO: troca permanece, apenas desconta vida (sem reverter)
+                    // MOVIMENTO SEM MATCH: troca permanece, desconta vida
                     vidas--;
                     tocarErro();
-                    // Renderização final com foco na coordenada de destino
                     renderizarTabuleiro(true);
                     atualizarInterface();
                     if (vidas <= 0) fimDeJogo(false);
@@ -476,25 +595,47 @@
             }, 300);
         }
 
+        // Retorna true se id1 e id2 fazem match (suporta Coringa)
+        function fazMatch(id1, id2) {
+            if (id1 === -1 || id2 === -1) return false;
+            if (id1 >= 10 && id1 !== ID_CORINGA) return false; // especiais (exceto coringa) não combinam
+            if (id2 >= 10 && id2 !== ID_CORINGA) return false;
+            if (id1 === ID_CORINGA || id2 === ID_CORINGA) return true; // coringa combina com tudo
+            return id1 === id2;
+        }
+
+        // Retorna o id "efetivo" de um trio para pontuação (descarta coringa)
+        function idEfetivoTrio(ids) {
+            return ids.find(id => id !== ID_CORINGA && id < 10) ?? -1;
+        }
+
         function checarMatches() {
             const config = CONFIG_NIVEIS[nivelIdx];
             let encontrou = false;
             let paraEliminar = Array.from({ length: config.tamanho }, () => Array(config.tamanho).fill(false));
+            // temCoringa[l][c] = true se a célula está numa trinca que contém coringa
+            let temCoringa = Array.from({ length: config.tamanho }, () => Array(config.tamanho).fill(false));
 
             for (let l = 0; l < config.tamanho; l++) {
                 for (let c = 0; c < config.tamanho - 2; c++) {
-                    let id = matrizGemas[l][c];
-                    if (id !== -1 && id === matrizGemas[l][c+1] && id === matrizGemas[l][c+2]) {
+                    const a = matrizGemas[l][c], b = matrizGemas[l][c+1], cc = matrizGemas[l][c+2];
+                    if (fazMatch(a,b) && fazMatch(b,cc) && fazMatch(a,cc)) {
                         paraEliminar[l][c] = paraEliminar[l][c+1] = paraEliminar[l][c+2] = true;
+                        if (a === ID_CORINGA || b === ID_CORINGA || cc === ID_CORINGA) {
+                            temCoringa[l][c] = temCoringa[l][c+1] = temCoringa[l][c+2] = true;
+                        }
                         encontrou = true;
                     }
                 }
             }
             for (let c = 0; c < config.tamanho; c++) {
                 for (let l = 0; l < config.tamanho - 2; l++) {
-                    let id = matrizGemas[l][c];
-                    if (id !== -1 && id === matrizGemas[l+1][c] && id === matrizGemas[l+2][c]) {
+                    const a = matrizGemas[l][c], b = matrizGemas[l+1][c], cc = matrizGemas[l+2][c];
+                    if (fazMatch(a,b) && fazMatch(b,cc) && fazMatch(a,cc)) {
                         paraEliminar[l][c] = paraEliminar[l+1][c] = paraEliminar[l+2][c] = true;
+                        if (a === ID_CORINGA || b === ID_CORINGA || cc === ID_CORINGA) {
+                            temCoringa[l][c] = temCoringa[l+1][c] = temCoringa[l+2][c] = true;
+                        }
                         encontrou = true;
                     }
                 }
@@ -507,8 +648,13 @@
                     for (let c = 0; c < config.tamanho; c++) {
                         if (paraEliminar[l][c]) {
                             let id = matrizGemas[l][c];
-                            if (id === joiaBonusId) { ptsBase += 20; atingiuBonusNoTurno = true; }
-                            else { ptsBase += 10; }
+                            let pts = 10;
+                            if (id === joiaBonusId) { pts = 20; atingiuBonusNoTurno = true; }
+                            // DOURADA: 2x pontos se célula estava dourada
+                            if (matrizDourada[l] && matrizDourada[l][c] !== -1) { pts *= 2; matrizDourada[l][c] = -1; }
+                            // CORINGA: 70% dos pontos na trinca que o contém
+                            if (temCoringa[l][c]) pts = Math.round(pts * 0.7);
+                            ptsBase += pts;
                             matrizGemas[l][c] = -1;
                             blocos++;
                         }
@@ -575,6 +721,61 @@
                     matrizGemas[l][c] = Math.floor(Math.random() * config.tipos);
                 }
             }
+        }
+
+        // Embaralha todas as gemas do tabuleiro (Assombrada)
+        function embaralharTabuleiro() {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            const todas = [];
+            for (let l = 0; l < config.tamanho; l++)
+                for (let c = 0; c < config.tamanho; c++)
+                    todas.push(matrizGemas[l][c]);
+            // Fisher-Yates
+            for (let i = todas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [todas[i], todas[j]] = [todas[j], todas[i]];
+            }
+            let idx = 0;
+            for (let l = 0; l < config.tamanho; l++)
+                for (let c = 0; c < config.tamanho; c++)
+                    matrizGemas[l][c] = todas[idx++];
+        }
+
+        // Sorteia gema dourada em posição aleatória (chance por turno)
+        function tentarSortearDourada() {
+            if (Math.random() > 0.15) return; // 15% de chance por turno
+            const config = CONFIG_NIVEIS[nivelIdx];
+            // Encontra células normais (sem especial, sem dourada)
+            const candidatas = [];
+            for (let l = 0; l < config.tamanho; l++)
+                for (let c = 0; c < config.tamanho; c++)
+                    if (matrizGemas[l][c] < 10 && matrizGemas[l][c] !== -1 && matrizDourada[l][c] === -1)
+                        candidatas.push({l, c});
+            if (candidatas.length === 0) return;
+            const {l, c} = candidatas[Math.floor(Math.random() * candidatas.length)];
+            matrizDourada[l][c] = matrizGemas[l][c]; // guarda o id original
+            matrizTurnoDourada[l][c] = 1;            // expira em 1 turno
+            tocarDourada();
+        }
+
+        // Avança o contador das douradas — as que expiraram voltam ao normal
+        function avancarTurnoDouradas() {
+            const config = CONFIG_NIVEIS[nivelIdx];
+            const t = TEXTOS[idiomaAtual];
+            let algunSomeu = false;
+            for (let l = 0; l < config.tamanho; l++) {
+                for (let c = 0; c < config.tamanho; c++) {
+                    if (matrizDourada[l][c] !== -1) {
+                        matrizTurnoDourada[l][c]--;
+                        if (matrizTurnoDourada[l][c] <= 0) {
+                            matrizDourada[l][c] = -1; // volta ao normal silenciosamente
+                            algunSomeu = true;
+                        }
+                    }
+                }
+            }
+            if (algunSomeu) anunciarTexto(t.msgDouradaSome);
+            tentarSortearDourada();
         }
 
         function atualizarInterface() {
@@ -650,14 +851,14 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.frequency.value = f;
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
             osc.start();
             osc.stop(audioCtx.currentTime + dur);
         }
 
         function tocarAcerto(combo) {
-            const frequencias = [523.25, 659.25, 783.99, 1046.50]; // Dó, Mi, Sol, Dó (C5 a C6)
+            const frequencias = [523.25, 659.25, 783.99, 1046.50];
             const nota = frequencias[Math.min(combo - 1, frequencias.length - 1)];
             tocarSom(nota, 0.4, 'triangle');
         }
@@ -671,6 +872,31 @@
         function tocarErro() {
             tocarSom(150, 0.4, 'sawtooth');
             setTimeout(() => tocarSom(100, 0.4, 'sawtooth'), 100);
+        }
+
+        // Som da Coringa: dois tons rápidos ascendentes (mistério)
+        function tocarCoringa() {
+            tocarSom(400, 0.15, 'sine');
+            setTimeout(() => tocarSom(600, 0.15, 'sine'), 120);
+        }
+
+        // Som da Amaldiçoada: tom grave distorcido (perigo)
+        function tocarAmaldicada() {
+            tocarSom(80, 0.5, 'sawtooth');
+            setTimeout(() => tocarSom(60, 0.5, 'sawtooth'), 150);
+        }
+
+        // Som da Assombrada: acorde dissonante com fade (embaralhamento)
+        function tocarAssombrada() {
+            tocarSom(300, 0.6, 'square');
+            setTimeout(() => tocarSom(450, 0.4, 'square'), 80);
+            setTimeout(() => tocarSom(200, 0.3, 'sawtooth'), 200);
+        }
+
+        // Som da Dourada: ding agudo brilhante
+        function tocarDourada() {
+            tocarSom(1200, 0.3, 'sine');
+            setTimeout(() => tocarSom(1000, 0.2, 'sine'), 100);
         }
 
         function anunciarTexto(txt) {
