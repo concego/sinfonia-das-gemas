@@ -95,6 +95,8 @@
             </div>
             <div id="status-vidas" class="status-item">Vidas: 5</div>
         </div>
+        <!-- ENTRADA NO TABULEIRO: permite que controles físicos e teclado coloquem foco na primeira gema -->
+        <button class="btn-fluxo secundario" id="btn-entrar-tabuleiro">Entrar no Tabuleiro</button>
         <!-- TABULEIRO: <table> real para anúncio de linha/coluna pelo TalkBack e VoiceOver -->
         <table id="tabuleiro" role="grid" aria-label="Tabuleiro de gemas"><tbody role="rowgroup"></tbody></table>
         <button class="btn-fluxo secundario" id="btn-abandonar">Sair do Jogo</button>
@@ -157,7 +159,7 @@
                 ],
                 btnFechar: "Fechar Instruções", statusNivel: "Nível", statusTabuleiro: "Tabuleiro",
                 statusBonus: "Bônus: Nenhum", statusBonusAtivo: "💎 Desafio: {gema} vale o DOBRO!",
-                statusPontos: "Pontos", statusVidas: "Vidas", btnAbandonar: "Sair do Jogo",
+                statusPontos: "Pontos", statusVidas: "Vidas", btnAbandonar: "Sair do Jogo", btnEntrarTabuleiro: "Entrar no Tabuleiro",
                 msgCombo: " Combo! Recuperou 1 vida.", msgGemaBonus: " Gema Bônus! Recuperou 1 vida.",
                 msgFinal: "Finalizado! {trincas} trincas. Mais {pontos} pontos. Total: {total} de {meta}.",
                 gemas: ["Rubi", "Safira", "Esmeralda", "Ônix", "Topázio", "Diamante"]
@@ -191,7 +193,7 @@
                 ],
                 btnFechar: "Close Instructions", statusNivel: "Level", statusTabuleiro: "Board",
                 statusBonus: "Bonus: None", statusBonusAtivo: "💎 Challenge: {gema} worth DOUBLE!",
-                statusPontos: "Score", statusVidas: "Lives", btnAbandonar: "Quit Game",
+                statusPontos: "Score", statusVidas: "Lives", btnAbandonar: "Quit Game", btnEntrarTabuleiro: "Enter the Board",
                 msgCombo: " Combo! Recovered 1 life.", msgGemaBonus: " Bonus Gem! Recovered 1 life.",
                 msgFinal: "Finished! {trincas} matches. {pontos} more points. Total: {total} of {meta}.",
                 gemas: ["Ruby", "Sapphire", "Emerald", "Onyx", "Topaz", "Diamond"]
@@ -273,6 +275,7 @@
             document.getElementById('btn-idioma-menu').innerText = t.btnIdioma;
             document.getElementById('bt-abrir-ajuda').innerText = t.btnAjuda;
             document.getElementById('btn-abandonar').innerText = t.btnAbandonar;
+            document.getElementById('btn-entrar-tabuleiro').innerText = t.btnEntrarTabuleiro;
 
             const selDif = document.getElementById('select-dificuldade');
             selDif.options[0].text = t.optFacil;
@@ -692,6 +695,11 @@
             document.getElementById('bt-abrir-ajuda').focus();
         };
         document.getElementById('btn-abandonar').onclick = voltarAoMenu;
+        // ENTRADA NO TABULEIRO: ao clicar, coloca o foco na primeira gema permitindo uso de controle físico
+        document.getElementById('btn-entrar-tabuleiro').onclick = () => {
+            const alvo = document.getElementById(`gema-${ultimoFoco.l}-${ultimoFoco.c}`);
+            if (alvo) alvo.focus();
+        };
         document.getElementById('btn-vitoria-menu').onclick = voltarAoMenu;
         document.getElementById('btn-gameover-menu').onclick = voltarAoMenu;
         document.getElementById('btn-tentar-novamente').onclick = iniciarPartida;
